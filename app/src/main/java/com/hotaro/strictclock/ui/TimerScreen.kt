@@ -15,6 +15,8 @@ import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.*
 import androidx.compose.material3.TabRowDefaults.SecondaryIndicator
 import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
+import androidx.compose.animation.*
+import androidx.compose.animation.core.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -29,11 +31,16 @@ import com.hotaro.strictclock.service.TimerManager
 import com.hotaro.strictclock.service.TimerService
 import com.hotaro.strictclock.ui.theme.*
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.collectIsPressedAsState
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.foundation.pager.HorizontalPager
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, androidx.compose.foundation.ExperimentalFoundationApi::class)
 @Composable
 fun TimerScreen() {
-    var selectedTab by remember { mutableStateOf(0) }
     val context = LocalContext.current
     
     val timeRemaining by TimerManager.timeRemaining.collectAsState()
@@ -105,48 +112,108 @@ fun TimerScreen() {
     ) {
         Spacer(modifier = Modifier.height(24.dp))
         
-        TabRow(
-            selectedTabIndex = selectedTab,
-            containerColor = Color.Transparent,
-            contentColor = onSurfaceDark,
-            indicator = { tabPositions ->
-                SecondaryIndicator(
-                    Modifier.tabIndicatorOffset(tabPositions[selectedTab]),
-                    color = primaryDark
-                )
-            },
-            divider = { }
+        val pagerState = androidx.compose.foundation.pager.rememberPagerState(pageCount = { 2 })
+        val coroutineScope = rememberCoroutineScope()
+        
+        Surface(
+            shape = CircleShape,
+            color = surfaceContainerHighDark,
+            modifier = Modifier.fillMaxWidth(0.8f).height(48.dp)
         ) {
-            Tab(
-                selected = selectedTab == 0,
-                onClick = { selectedTab = 0 },
-                text = { Text("Timer", fontSize = 18.sp, fontWeight = if(selectedTab == 0) FontWeight.Bold else FontWeight.Normal) }
-            )
-            Tab(
-                selected = selectedTab == 1,
-                onClick = { selectedTab = 1 },
-                text = { Text("Stopwatch", fontSize = 18.sp, fontWeight = if(selectedTab == 1) FontWeight.Bold else FontWeight.Normal) }
-            )
+            BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
+                val halfWidth = maxWidth / 2
+                val offset by androidx.compose.animation.core.animateDpAsState(
+                    targetValue = if (pagerState.currentPage == 0) 0.dp else halfWidth,
+                    label = "capsule_offset"
+                )
+                
+                Box(
+                    modifier = Modifier
+                        .offset(x = offset)
+                        .width(halfWidth)
+                        .fillMaxHeight()
+                        .padding(4.dp)
+                        .background(primaryDark, CircleShape)
+                )
+                
+                Row(modifier = Modifier.fillMaxSize()) {
+                    Box(
+                        modifier = Modifier.weight(1f).fillMaxHeight()
+                            .clickable(
+                                interactionSource = remember { MutableInteractionSource() },
+                                indication = null
+                            ) { coroutineScope.launch { pagerState.animateScrollToPage(0) } },
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text("Timer", color = if (pagerState.currentPage == 0) onPrimaryDark else onSurfaceVariantDark, fontWeight = FontWeight.Bold, fontSize = 14.sp)
+                    }
+                    Box(
+                        modifier = Modifier.weight(1f).fillMaxHeight()
+                            .clickable(
+                                interactionSource = remember { MutableInteractionSource() },
+                                indication = null
+                            ) { coroutineScope.launch { pagerState.animateScrollToPage(1) } },
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text("Stopwatch", color = if (pagerState.currentPage == 1) onPrimaryDark else onSurfaceVariantDark, fontWeight = FontWeight.Bold, fontSize = 14.sp)
+                    }
+                }
+            }
         }
         
-        if (selectedTab == 0) {
-            // Timer View
-            if (!isRunning && timeRemaining == 0L) {
-                Spacer(modifier = Modifier.weight(1f))
-                
-                val h = timePickerState.hour
-                val m = timePickerState.minute
-                val timeStr = if (h > 0) String.format("%02d:%02d:00", h, m) else String.format("%02d:00", m)
-                
-                Text(timeStr, fontSize = 72.sp, fontWeight = FontWeight.Normal, color = onSurfaceDark)
-                Spacer(modifier = Modifier.height(16.dp))
-                Text("Set timer (HH:MM)", color = onSurfaceVariantDark, fontSize = 20.sp)
+        Spacer(modifier = Modifier.height(16.dp))
+
+        androidx.compose.foundation.pager.HorizontalPager(state = pagerState, modifier = Modifier.weight(1f)) { page ->
+            if (page == 0) {
+                AnimatedContent(
+                    targetState = (!isRunning && timeRemaining == 0L),
+                    modifier = Modifier.fillMaxSize(),
+                    transitionSpec = {
+                        scaleIn(
+                            animationSpec = spring(
+                                dampingRatio = Spring.DampingRatioMediumBouncy,
+                                stiffness = Spring.StiffnessLow
+                            ),
+                            initialScale = 0.8f
+                        ) togetherWith scaleOut(
+                            animationSpec = spring(
+                                dampingRatio = Spring.DampingRatioNoBouncy,
+                                stiffness = Spring.StiffnessMedium
+                            ),
+                            targetScale = 0.8f
+                        )
+                    },
+                    label = "timer_state"
+                ) { isSetupState ->
+                    Column(
+                        modifier = Modifier.fillMaxSize(),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        // Timer View
+                        if (isSetupState) {
+                            Spacer(modifier = Modifier.weight(1f))
+                        
+                        val h = timePickerState.hour
+                        val m = timePickerState.minute
+                        val timeStr = if (h > 0) String.format("%02d:%02d:00", h, m) else String.format("%02d:00", m)
+                        
+                        Text(timeStr, fontSize = 72.sp, fontWeight = FontWeight.Normal, color = onSurfaceDark)
                 
                 Spacer(modifier = Modifier.weight(1f))
                 
                 // Pill FAB for start and setup
+                val startInteractionSource = remember { MutableInteractionSource() }
+                val setupInteractionSource = remember { MutableInteractionSource() }
+                val isStartPressed by startInteractionSource.collectIsPressedAsState()
+                val isSetupPressed by setupInteractionSource.collectIsPressedAsState()
+                val isPressed = isStartPressed || isSetupPressed
+                val cornerRadius by androidx.compose.animation.core.animateDpAsState(
+                    targetValue = if (isPressed) 16.dp else 50.dp, 
+                    label = "pill_shape"
+                )
+
                 Surface(
-                    shape = androidx.compose.foundation.shape.RoundedCornerShape(50),
+                    shape = androidx.compose.foundation.shape.RoundedCornerShape(cornerRadius),
                     color = primaryDark,
                     modifier = Modifier
                         .height(88.dp)
@@ -171,6 +238,7 @@ fun TimerScreen() {
                                     }
                                 }
                             },
+                            interactionSource = startInteractionSource,
                             modifier = Modifier.weight(1f).fillMaxHeight()
                         ) {
                             Icon(Icons.Default.PlayArrow, contentDescription = "Start", tint = onPrimaryDark, modifier = Modifier.size(40.dp))
@@ -185,14 +253,15 @@ fun TimerScreen() {
                         
                         IconButton(
                             onClick = { showTimePickerDialog = true },
+                            interactionSource = setupInteractionSource,
                             modifier = Modifier.weight(1f).fillMaxHeight()
                         ) {
                             Icon(Icons.Default.Alarm, contentDescription = "Set Time", tint = onPrimaryDark, modifier = Modifier.size(32.dp))
                         }
                     }
                 }
-            } else {
-                val maxTime by TimerManager.maxTime.collectAsState()
+                        } else {
+                            val maxTime by TimerManager.maxTime.collectAsState()
                 
                 Spacer(modifier = Modifier.weight(1f))
                 
@@ -309,11 +378,14 @@ fun TimerScreen() {
                     }
                 }
                 
-                Spacer(modifier = Modifier.weight(1f))
-            }
+                            Spacer(modifier = Modifier.weight(1f))
+                        }
+                    }
+                }
         } else {
             // Stopwatch View
             StopwatchTabContent()
+        }
         }
     }
 }

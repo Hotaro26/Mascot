@@ -3,6 +3,8 @@ package com.hotaro.strictclock.ui
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.outlined.Check
@@ -15,11 +17,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.activity.compose.BackHandler
 import com.hotaro.strictclock.ui.theme.ThemeManager
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ColorSchemeScreen(onBack: () -> Unit) {
+    BackHandler { onBack() }
     val activeScheme by ThemeManager.activeScheme.collectAsState()
 
     Scaffold(
@@ -30,10 +34,10 @@ fun ColorSchemeScreen(onBack: () -> Unit) {
                     Surface(
                         shape = CircleShape,
                         color = MaterialTheme.colorScheme.primaryContainer,
-                        modifier = Modifier.padding(start = 16.dp, top = 12.dp, bottom = 12.dp, end = 8.dp).size(28.dp)
+                        modifier = Modifier.padding(start = 16.dp, top = 8.dp, bottom = 8.dp, end = 8.dp).size(40.dp)
                     ) {
                         IconButton(onClick = onBack, modifier = Modifier.fillMaxSize()) {
-                            Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back", tint = MaterialTheme.colorScheme.onPrimaryContainer, modifier = Modifier.size(16.dp))
+                            Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back", tint = MaterialTheme.colorScheme.onPrimaryContainer, modifier = Modifier.size(24.dp))
                         }
                     }
                 },
@@ -42,7 +46,13 @@ fun ColorSchemeScreen(onBack: () -> Unit) {
         },
         containerColor = MaterialTheme.colorScheme.background
     ) { innerPadding ->
-        Column(modifier = Modifier.padding(innerPadding).padding(16.dp)) {
+        Column(
+            modifier = Modifier
+                .padding(innerPadding)
+                .padding(horizontal = 16.dp)
+                .verticalScroll(rememberScrollState())
+        ) {
+            Spacer(modifier = Modifier.height(16.dp))
             Text("Select your preferred color scheme", color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 16.sp)
             Spacer(modifier = Modifier.height(24.dp))
             
@@ -57,7 +67,7 @@ fun ColorSchemeScreen(onBack: () -> Unit) {
             
             SchemeOption(
                 title = "Strict Default",
-                subtitle = "The original StrictClock dark theme",
+                subtitle = "The original mastco dark theme",
                 isSelected = activeScheme == "Strict Default",
                 onClick = { ThemeManager.setScheme("Strict Default") }
             )
@@ -97,6 +107,8 @@ fun ColorSchemeScreen(onBack: () -> Unit) {
                 isSelected = activeScheme == "Mocha",
                 onClick = { ThemeManager.setScheme("Mocha") }
             )
+            
+            Spacer(modifier = Modifier.height(32.dp))
         }
     }
 }

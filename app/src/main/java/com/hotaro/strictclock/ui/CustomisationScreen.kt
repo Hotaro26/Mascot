@@ -15,11 +15,13 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.activity.compose.BackHandler
 import com.hotaro.strictclock.ui.theme.*
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CustomisationScreen(onBack: () -> Unit) {
+    BackHandler { onBack() }
     val context = LocalContext.current
     val prefs = context.getSharedPreferences("strict_clock_prefs", Context.MODE_PRIVATE)
     
@@ -35,10 +37,10 @@ fun CustomisationScreen(onBack: () -> Unit) {
                     Surface(
                         shape = CircleShape,
                         color = primaryContainerDark,
-                        modifier = Modifier.padding(start = 16.dp, top = 12.dp, bottom = 12.dp, end = 8.dp).size(28.dp)
+                        modifier = Modifier.padding(start = 16.dp, top = 8.dp, bottom = 8.dp, end = 8.dp).size(40.dp)
                     ) {
                         IconButton(onClick = onBack, modifier = Modifier.fillMaxSize()) {
-                            Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back", tint = onPrimaryContainerDark, modifier = Modifier.size(16.dp))
+                            Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back", tint = onPrimaryContainerDark, modifier = Modifier.size(24.dp))
                         }
                     }
                 },

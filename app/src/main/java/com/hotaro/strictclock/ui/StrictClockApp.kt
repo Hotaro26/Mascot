@@ -238,7 +238,8 @@ fun StrictClockApp(isWakeUp: Boolean = false, challengeType: String = "None", qr
                         onNavigateToQrManagement = { currentScreen = "QrManagement" },
                         onNavigateToZenMode = { currentScreen = "ZenMode" },
                         onNavigateToCustomisation = { currentScreen = "Customisation" },
-                        onNavigateToAiReadiness = { currentScreen = "AiReadiness" }
+                        onNavigateToAiReadiness = { currentScreen = "AiReadiness" },
+                        onNavigateToAbout = { currentScreen = "About" }
                     )
                     "ColorScheme" -> ColorSchemeScreen(onBack = { currentScreen = "Settings" })
                     "ThemeMode" -> ThemeModeScreen(onBack = { currentScreen = "Settings" })
@@ -246,6 +247,7 @@ fun StrictClockApp(isWakeUp: Boolean = false, challengeType: String = "None", qr
                     "ZenMode" -> ZenModeScreen(onBack = { currentScreen = "Settings" })
                     "Customisation" -> CustomisationScreen(onBack = { currentScreen = "Settings" })
                     "AiReadiness" -> AiReadinessScreen(onBack = { currentScreen = "Settings" })
+                    "About" -> AboutScreen(onBack = { currentScreen = "Settings" })
                     else -> ClockDashboard(onNavigateToSetup = { currentScreen = "Setup" })
                 }
             }

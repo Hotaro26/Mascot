@@ -15,25 +15,27 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.activity.compose.BackHandler
 import com.hotaro.strictclock.ui.theme.ThemeManager
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ThemeModeScreen(onBack: () -> Unit) {
+    BackHandler { onBack() }
     val themeMode by ThemeManager.themeMode.collectAsState()
 
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Theme Mode", fontWeight = FontWeight.Bold) },
+                title = { Text("Theme Mode", fontWeight = FontWeight.Bold, fontSize = 20.sp) },
                 navigationIcon = {
                     Surface(
                         shape = CircleShape,
                         color = MaterialTheme.colorScheme.primaryContainer,
-                        modifier = Modifier.padding(start = 16.dp, top = 12.dp, bottom = 12.dp, end = 8.dp).size(28.dp)
+                        modifier = Modifier.padding(start = 16.dp, top = 8.dp, bottom = 8.dp, end = 8.dp).size(40.dp)
                     ) {
                         IconButton(onClick = onBack, modifier = Modifier.fillMaxSize()) {
-                            Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back", tint = MaterialTheme.colorScheme.onPrimaryContainer, modifier = Modifier.size(16.dp))
+                            Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back", tint = MaterialTheme.colorScheme.onPrimaryContainer, modifier = Modifier.size(24.dp))
                         }
                     }
                 },

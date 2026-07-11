@@ -27,7 +27,8 @@ fun SettingsScreen(
     onNavigateToQrManagement: () -> Unit = {},
     onNavigateToZenMode: () -> Unit = {},
     onNavigateToCustomisation: () -> Unit = {},
-    onNavigateToAiReadiness: () -> Unit = {}
+    onNavigateToAiReadiness: () -> Unit = {},
+    onNavigateToAbout: () -> Unit = {}
 ) {
     Scaffold(
         topBar = {
@@ -134,7 +135,19 @@ fun SettingsScreen(
                 showArrow = true,
                 onClick = onNavigateToThemeMode
             )
+            Spacer(modifier = Modifier.height(32.dp))
+            
+            // About
+            Text("About", color = onSurfaceDark, fontSize = 16.sp, fontWeight = FontWeight.Medium)
             Spacer(modifier = Modifier.height(16.dp))
+            SettingsRow(
+                icon = Icons.Outlined.Info, 
+                title = "About mastco", 
+                subtitle = "App version and developer info", 
+                showArrow = true,
+                onClick = onNavigateToAbout
+            )
+            Spacer(modifier = Modifier.height(32.dp))
         }
     }
 }

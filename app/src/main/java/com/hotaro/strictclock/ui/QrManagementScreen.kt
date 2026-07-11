@@ -5,10 +5,12 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.QrCode
 import androidx.compose.material3.*
@@ -20,6 +22,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.activity.compose.BackHandler
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import com.hotaro.strictclock.ui.challenges.QRScannerView
@@ -56,6 +59,7 @@ fun saveQrs(context: Context, list: List<QrCodeModel>) {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun QrManagementScreen(onBack: () -> Unit) {
+    BackHandler { onBack() }
     val context = LocalContext.current
     var qrList by remember { mutableStateOf(loadQrs(context)) }
     
@@ -71,7 +75,15 @@ fun QrManagementScreen(onBack: () -> Unit) {
             TopAppBar(
                 title = { Text("Manage QR Codes", fontWeight = FontWeight.SemiBold) },
                 navigationIcon = {
-                    IconButton(onClick = onBack) { Icon(Icons.Filled.ArrowBack, contentDescription = "Back") }
+                    Surface(
+                        shape = CircleShape,
+                        color = primaryContainerDark,
+                        modifier = Modifier.padding(start = 16.dp, top = 8.dp, bottom = 8.dp, end = 8.dp).size(40.dp)
+                    ) {
+                        IconButton(onClick = onBack, modifier = Modifier.fillMaxSize()) {
+                            Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back", tint = onPrimaryContainerDark, modifier = Modifier.size(24.dp))
+                        }
+                    }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(containerColor = backgroundDark, titleContentColor = onSurfaceDark, navigationIconContentColor = onSurfaceDark)
             )
@@ -129,7 +141,7 @@ fun QrManagementScreen(onBack: () -> Unit) {
                             }
                         )
                         IconButton(onClick = { showScanner = false }, modifier = Modifier.align(Alignment.TopStart).padding(16.dp)) {
-                            Icon(Icons.Filled.ArrowBack, contentDescription = "Back", tint = Color.White)
+                            Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back", tint = Color.White)
                         }
                     }
                 }
