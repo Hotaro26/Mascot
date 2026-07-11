@@ -24,7 +24,8 @@ import com.hotaro.strictclock.ui.theme.*
 fun SettingsScreen(
     onNavigateToColorScheme: () -> Unit = {},
     onNavigateToThemeMode: () -> Unit = {},
-    onNavigateToQrManagement: () -> Unit = {}
+    onNavigateToQrManagement: () -> Unit = {},
+    onNavigateToZenMode: () -> Unit = {}
 ) {
     Scaffold(
         topBar = {
@@ -87,7 +88,7 @@ fun SettingsScreen(
             // Alarm Behavior
             Text("Alarm Behavior", color = onSurfaceDark, fontSize = 16.sp, fontWeight = FontWeight.Medium)
             Spacer(modifier = Modifier.height(16.dp))
-            SettingsRow(icon = Icons.Outlined.Snooze, title = "Snooze Duration", subtitle = "Currently 5 minutes", showArrow = true)
+            SettingsRow(icon = Icons.Outlined.Snooze, title = "Zen Mode", subtitle = "Manage snoozing", showArrow = true, onClick = onNavigateToZenMode)
             Spacer(modifier = Modifier.height(8.dp))
             val isAmoled by ThemeManager.isAmoled.collectAsState()
             SettingsRowSwitch(icon = Icons.Outlined.DarkMode, title = "Amoled Mode", subtitle = "True black background", checked = isAmoled, onCheckedChange = { ThemeManager.setAmoled(it) })

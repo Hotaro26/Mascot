@@ -30,7 +30,16 @@ import androidx.compose.ui.platform.LocalContext
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun WakeUpScreen(challengeType: String = "None", qrCodeData: String = "", qrCodeName: String = "", onStopAlarm: () -> Unit = {}) {
+fun WakeUpScreen(
+    challengeType: String = "None", 
+    qrCodeData: String = "", 
+    qrCodeName: String = "", 
+    onStopAlarm: () -> Unit = {},
+    onSnoozeAlarm: () -> Unit = {}
+) {
+    val context = LocalContext.current
+    val prefs = context.getSharedPreferences("strict_clock_prefs", Context.MODE_PRIVATE)
+    val zenModeEnabled = prefs.getBoolean("zen_mode", true)
     val currentTime = Calendar.getInstance()
     val hour = currentTime.get(Calendar.HOUR_OF_DAY)
     val minute = currentTime.get(Calendar.MINUTE)
@@ -70,17 +79,17 @@ fun WakeUpScreen(challengeType: String = "None", qrCodeData: String = "", qrCode
             Spacer(modifier = Modifier.height(24.dp))
             
             when (challengeType) {
-                "Math" -> MathChallengeView(onStopAlarm)
-                "QR Code" -> QRChallengeView(qrCodeData, qrCodeName, onStopAlarm)
-                "QR" -> QRChallengeView(qrCodeData, qrCodeName, onStopAlarm)
-                else -> RegularWakeUpView(onStopAlarm)
+                "Math" -> MathChallengeView(zenModeEnabled, onSnoozeAlarm, onStopAlarm)
+                "QR Code" -> QRChallengeView(qrCodeData, qrCodeName, zenModeEnabled, onSnoozeAlarm, onStopAlarm)
+                "QR" -> QRChallengeView(qrCodeData, qrCodeName, zenModeEnabled, onSnoozeAlarm, onStopAlarm)
+                else -> RegularWakeUpView(zenModeEnabled, onSnoozeAlarm, onStopAlarm)
             }
         }
     }
 }
 
 @Composable
-fun MathChallengeView(onStopAlarm: () -> Unit) {
+fun MathChallengeView(zenModeEnabled: Boolean, onSnoozeAlarm: () -> Unit, onStopAlarm: () -> Unit) {
     var problemsSolved by remember { mutableStateOf(0) }
     val totalProblems = 3
     var currentProblem by remember { mutableStateOf(MathChallenge.generateProblem()) }
@@ -154,10 +163,27 @@ fun MathChallengeView(onStopAlarm: () -> Unit) {
             }
         }
     }
+    
+    if (!zenModeEnabled) {
+        Spacer(modifier = Modifier.height(16.dp))
+        
+        Button(
+            onClick = onSnoozeAlarm,
+            modifier = Modifier.fillMaxWidth().height(64.dp),
+            colors = ButtonDefaults.buttonColors(containerColor = surfaceContainerHighDark, contentColor = onSurfaceDark),
+            shape = RoundedCornerShape(32.dp)
+        ) {
+            Icon(Icons.Outlined.Snooze, contentDescription = null)
+            Spacer(modifier = Modifier.width(8.dp))
+            Text("Snooze (5:00)", fontSize = 16.sp, fontWeight = FontWeight.Medium)
+        }
+    }
+    
+    Spacer(modifier = Modifier.height(32.dp))
 }
 
 @Composable
-fun ColumnScope.QRChallengeView(qrCodeData: String, qrCodeName: String, onStopAlarm: () -> Unit) {
+fun ColumnScope.QRChallengeView(qrCodeData: String, qrCodeName: String, zenModeEnabled: Boolean, onSnoozeAlarm: () -> Unit, onStopAlarm: () -> Unit) {
     var showError by remember { mutableStateOf(false) }
     Card(
         modifier = Modifier.fillMaxWidth().weight(1f),
@@ -215,24 +241,26 @@ fun ColumnScope.QRChallengeView(qrCodeData: String, qrCodeName: String, onStopAl
         Text("Capture & Stop", fontSize = 16.sp, fontWeight = FontWeight.Bold)
     }
     
-    Spacer(modifier = Modifier.height(16.dp))
-    
-    Button(
-        onClick = { },
-        modifier = Modifier.fillMaxWidth().height(64.dp),
-        colors = ButtonDefaults.buttonColors(containerColor = surfaceContainerHighDark, contentColor = onSurfaceDark),
-        shape = RoundedCornerShape(32.dp)
-    ) {
-        Icon(Icons.Outlined.Snooze, contentDescription = null)
-        Spacer(modifier = Modifier.width(8.dp))
-        Text("Snooze (9:00)", fontSize = 16.sp, fontWeight = FontWeight.Medium)
+    if (!zenModeEnabled) {
+        Spacer(modifier = Modifier.height(16.dp))
+        
+        Button(
+            onClick = onSnoozeAlarm,
+            modifier = Modifier.fillMaxWidth().height(64.dp),
+            colors = ButtonDefaults.buttonColors(containerColor = surfaceContainerHighDark, contentColor = onSurfaceDark),
+            shape = RoundedCornerShape(32.dp)
+        ) {
+            Icon(Icons.Outlined.Snooze, contentDescription = null)
+            Spacer(modifier = Modifier.width(8.dp))
+            Text("Snooze (5:00)", fontSize = 16.sp, fontWeight = FontWeight.Medium)
+        }
     }
     
     Spacer(modifier = Modifier.height(32.dp))
 }
 
 @Composable
-fun RegularWakeUpView(onStopAlarm: () -> Unit) {
+fun RegularWakeUpView(zenModeEnabled: Boolean, onSnoozeAlarm: () -> Unit, onStopAlarm: () -> Unit) {
     Column {
         Spacer(modifier = Modifier.weight(1f))
         Button(
@@ -246,17 +274,19 @@ fun RegularWakeUpView(onStopAlarm: () -> Unit) {
             Text("Stop Alarm", fontSize = 18.sp, fontWeight = FontWeight.Medium)
         }
         
-        Spacer(modifier = Modifier.height(16.dp))
-        
-        Button(
-            onClick = { },
-            modifier = Modifier.fillMaxWidth().height(64.dp),
-            colors = ButtonDefaults.buttonColors(containerColor = surfaceContainerHighDark, contentColor = onSurfaceDark),
-            shape = RoundedCornerShape(32.dp)
-        ) {
-            Icon(Icons.Outlined.Snooze, contentDescription = null)
-            Spacer(modifier = Modifier.width(8.dp))
-            Text("Snooze (9:00)", fontSize = 18.sp, fontWeight = FontWeight.Medium)
+        if (!zenModeEnabled) {
+            Spacer(modifier = Modifier.height(16.dp))
+            
+            Button(
+                onClick = onSnoozeAlarm,
+                modifier = Modifier.fillMaxWidth().height(64.dp),
+                colors = ButtonDefaults.buttonColors(containerColor = surfaceContainerHighDark, contentColor = onSurfaceDark),
+                shape = RoundedCornerShape(32.dp)
+            ) {
+                Icon(Icons.Outlined.Snooze, contentDescription = null)
+                Spacer(modifier = Modifier.width(8.dp))
+                Text("Snooze (5:00)", fontSize = 18.sp, fontWeight = FontWeight.Medium)
+            }
         }
         Spacer(modifier = Modifier.height(32.dp))
     }

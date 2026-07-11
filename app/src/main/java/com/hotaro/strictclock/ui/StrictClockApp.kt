@@ -172,24 +172,59 @@ fun StrictClockApp(isWakeUp: Boolean = false, challengeType: String = "None", qr
                         }
                     )
                     "Setup" -> SetupAlarmScreen(viewModel = alarmViewModel, alarm = selectedAlarm, onBack = { currentScreen = "Alarms" })
-                    "WakeUp" -> WakeUpScreen(
-                        challengeType = challengeType,
-                        qrCodeData = qrCodeData,
-                        qrCodeName = qrCodeName,
-                        onStopAlarm = {
-                            context.stopService(android.content.Intent(context, com.hotaro.strictclock.service.AlarmService::class.java))
-                            currentScreen = "Alarms"
-                        }
-                    )
+                    "WakeUp" -> {
+                        val soundUri = (context as android.app.Activity).intent.getStringExtra("SOUND_URI") ?: ""
+                        val vibrationEnabled = context.intent.getBooleanExtra("VIBRATION_ENABLED", true)
+                        
+                        WakeUpScreen(
+                            challengeType = challengeType, 
+                            qrCodeData = qrCodeData, 
+                            qrCodeName = qrCodeName,
+                            onStopAlarm = {
+                                val serviceIntent = android.content.Intent(context, com.hotaro.strictclock.service.AlarmService::class.java)
+                                context.stopService(serviceIntent)
+                                context.finish()
+                            },
+                            onSnoozeAlarm = {
+                                val serviceIntent = android.content.Intent(context, com.hotaro.strictclock.service.AlarmService::class.java)
+                                context.stopService(serviceIntent)
+                                
+                                val alarmId = context.intent.getIntExtra("ALARM_ID", -1)
+                                val intent = android.content.Intent(context, com.hotaro.strictclock.service.AlarmReceiver::class.java).apply {
+                                    putExtra("ALARM_ID", alarmId)
+                                    putExtra("CHALLENGE_TYPE", challengeType)
+                                    putExtra("SOUND_URI", soundUri)
+                                    putExtra("VIBRATION_ENABLED", vibrationEnabled)
+                                    putExtra("QR_CODE_DATA", qrCodeData)
+                                    putExtra("QR_CODE_NAME", qrCodeName)
+                                }
+                                
+                                val pendingIntent = android.app.PendingIntent.getBroadcast(
+                                    context, 
+                                    alarmId, 
+                                    intent, 
+                                    android.app.PendingIntent.FLAG_UPDATE_CURRENT or android.app.PendingIntent.FLAG_IMMUTABLE
+                                )
+                                
+                                val alarmManager = context.getSystemService(android.content.Context.ALARM_SERVICE) as android.app.AlarmManager
+                                val triggerTime = System.currentTimeMillis() + 5 * 60 * 1000
+                                alarmManager.setAlarmClock(android.app.AlarmManager.AlarmClockInfo(triggerTime, pendingIntent), pendingIntent)
+                                
+                                context.finish()
+                            }
+                        )
+                    }
                     "Timer" -> TimerScreen()
                     "Settings" -> SettingsScreen(
                         onNavigateToColorScheme = { currentScreen = "ColorScheme" },
                         onNavigateToThemeMode = { currentScreen = "ThemeMode" },
-                        onNavigateToQrManagement = { currentScreen = "QrManagement" }
+                        onNavigateToQrManagement = { currentScreen = "QrManagement" },
+                        onNavigateToZenMode = { currentScreen = "ZenMode" }
                     )
                     "ColorScheme" -> ColorSchemeScreen(onBack = { currentScreen = "Settings" })
                     "ThemeMode" -> ThemeModeScreen(onBack = { currentScreen = "Settings" })
                     "QrManagement" -> QrManagementScreen(onBack = { currentScreen = "Settings" })
+                    "ZenMode" -> ZenModeScreen(onBack = { currentScreen = "Settings" })
                     else -> ClockDashboard(onNavigateToSetup = { currentScreen = "Setup" })
                 }
             }

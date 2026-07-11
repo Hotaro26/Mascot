@@ -59,6 +59,7 @@ fun SetupAlarmScreen(viewModel: AlarmViewModel? = null, alarm: AlarmEntity? = nu
     var scannedQrCode by remember { mutableStateOf<String?>(null) }
     var showQrOptionsDialog by remember { mutableStateOf(false) }
     var showSelectQrDialog by remember { mutableStateOf(false) }
+    var showStrictModeDialog by remember { mutableStateOf(false) }
     val context = LocalContext.current
     val savedQrs = remember { loadQrs(context) }
     val ringtoneLauncher = rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
@@ -95,25 +96,29 @@ fun SetupAlarmScreen(viewModel: AlarmViewModel? = null, alarm: AlarmEntity? = nu
                 actions = {
                     Button(
                         onClick = {
-                            val newAlarm = AlarmEntity(
-                                id = alarm?.id ?: 0,
-                                timeHour = timePickerState.hour,
-                                timeMinute = timePickerState.minute,
-                                daysOfWeek = repeatDays,
-                                isActive = true,
-                                challengeType = selectedChallenge,
-                                soundName = soundName,
-                                soundUri = soundUri,
-                                vibrationEnabled = vibrationEnabled,
-                                qrCodeData = qrCodeData,
-                                qrCodeName = qrCodeName
-                            )
-                            if (alarm == null) {
-                                viewModel?.insert(newAlarm)
+                            if (selectedChallenge == "None" || ((selectedChallenge == "QR" || selectedChallenge == "QR Code") && qrCodeData.isEmpty())) {
+                                showStrictModeDialog = true
                             } else {
-                                viewModel?.update(newAlarm)
+                                val newAlarm = AlarmEntity(
+                                    id = alarm?.id ?: 0,
+                                    timeHour = timePickerState.hour,
+                                    timeMinute = timePickerState.minute,
+                                    daysOfWeek = repeatDays,
+                                    isActive = true,
+                                    challengeType = selectedChallenge,
+                                    soundName = soundName,
+                                    soundUri = soundUri,
+                                    vibrationEnabled = vibrationEnabled,
+                                    qrCodeData = qrCodeData,
+                                    qrCodeName = qrCodeName
+                                )
+                                if (alarm == null) {
+                                    viewModel?.insert(newAlarm)
+                                } else {
+                                    viewModel?.update(newAlarm)
+                                }
+                                onBack()
                             }
-                            onBack()
                         },
                         colors = ButtonDefaults.buttonColors(containerColor = primaryContainerDark, contentColor = onPrimaryContainerDark),
                         modifier = Modifier.padding(end = 8.dp)
@@ -126,6 +131,22 @@ fun SetupAlarmScreen(viewModel: AlarmViewModel? = null, alarm: AlarmEntity? = nu
         },
         containerColor = backgroundDark
     ) { innerPadding ->
+        if (showStrictModeDialog) {
+            AlertDialog(
+                onDismissRequest = { showStrictModeDialog = false },
+                title = { Text("Strict Mode Required", color = onSurfaceDark) },
+                text = { Text("You must select a strict mode task (like Math or QR) to save this alarm. If you select QR Code, please select a pre-saved QR code or scan a new one.", color = onSurfaceVariantDark) },
+                confirmButton = {
+                    TextButton(onClick = { showStrictModeDialog = false }) {
+                        Text("OK", color = primaryDark)
+                    }
+                },
+                containerColor = surfaceContainerHighDark,
+                titleContentColor = onSurfaceDark,
+                textContentColor = onSurfaceVariantDark
+            )
+        }
+        
         Column(
             modifier = Modifier
                 .fillMaxSize()

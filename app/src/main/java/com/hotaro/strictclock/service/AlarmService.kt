@@ -53,6 +53,8 @@ class AlarmService : Service() {
             putExtra("IS_WAKE_UP", true)
             putExtra("CHALLENGE_TYPE", challengeType)
             putExtra("ALARM_ID", alarmId)
+            putExtra("SOUND_URI", soundUriStr)
+            putExtra("VIBRATION_ENABLED", vibrationEnabled)
             putExtra("QR_CODE_DATA", qrCodeData)
             putExtra("QR_CODE_NAME", qrCodeName)
         }
