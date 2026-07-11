@@ -67,7 +67,7 @@ fun ColorSchemeScreen(onBack: () -> Unit) {
             
             SchemeOption(
                 title = "Strict Default",
-                subtitle = "The original mastco dark theme",
+                subtitle = "The original mascot dark theme",
                 isSelected = activeScheme == "Strict Default",
                 onClick = { ThemeManager.setScheme("Strict Default") }
             )

@@ -3,6 +3,7 @@ package com.hotaro.strictclock.ui
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
@@ -524,7 +525,7 @@ fun SetupAlarmScreen(viewModel: AlarmViewModel? = null, alarm: AlarmEntity? = nu
                         val allTargets = listOf(
                             "Sink", "Chair", "Mug", "Keyboard", "Shoe", "Toothbrush", 
                             "Laptop", "Television", "Bottle", "Cup", "Spoon", "Fork", 
-                            "Plate", "Bed", "Door", "Window", "Book", "Pen"
+                            "Plate", "Bed", "Door", "Window", "Book", "Pen", "Paper", "Poster"
                         )
                         allTargets.forEach { target ->
                             Row(modifier = Modifier.fillMaxWidth().clickable { 
@@ -549,8 +550,29 @@ fun SetupAlarmScreen(viewModel: AlarmViewModel? = null, alarm: AlarmEntity? = nu
 }
 
 @Composable
-fun SettingsRow(icon: ImageVector, title: String, subtitle: String, showArrow: Boolean = false, shape: androidx.compose.ui.graphics.Shape = RoundedCornerShape(24.dp), onClick: () -> Unit = {}) {
-    Card(shape = shape, colors = CardDefaults.cardColors(containerColor = surfaceContainerHighDark), modifier = Modifier.fillMaxWidth().clickable { onClick() }) {
+fun SettingsRow(
+    icon: ImageVector, title: String, subtitle: String, showArrow: Boolean = false,
+    topStart: androidx.compose.ui.unit.Dp = 24.dp, topEnd: androidx.compose.ui.unit.Dp = 24.dp,
+    bottomStart: androidx.compose.ui.unit.Dp = 24.dp, bottomEnd: androidx.compose.ui.unit.Dp = 24.dp,
+    onClick: () -> Unit = {}
+) {
+    val interactionSource = remember { androidx.compose.foundation.interaction.MutableInteractionSource() }
+    val isPressed by interactionSource.collectIsPressedAsState()
+    
+    val aTopStart by androidx.compose.animation.core.animateDpAsState(if (isPressed) 24.dp else topStart, label = "")
+    val aTopEnd by androidx.compose.animation.core.animateDpAsState(if (isPressed) 24.dp else topEnd, label = "")
+    val aBottomStart by androidx.compose.animation.core.animateDpAsState(if (isPressed) 24.dp else bottomStart, label = "")
+    val aBottomEnd by androidx.compose.animation.core.animateDpAsState(if (isPressed) 24.dp else bottomEnd, label = "")
+
+    Card(
+        shape = RoundedCornerShape(aTopStart, aTopEnd, aBottomStart, aBottomEnd),
+        colors = CardDefaults.cardColors(containerColor = surfaceContainerHighDark),
+        modifier = Modifier.fillMaxWidth().clickable(
+            interactionSource = interactionSource,
+            indication = androidx.compose.foundation.LocalIndication.current,
+            onClick = onClick
+        )
+    ) {
         Row(modifier = Modifier.padding(16.dp).fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
             Icon(icon, contentDescription = null, tint = onSurfaceVariantDark)
             Spacer(modifier = Modifier.width(16.dp))
@@ -566,10 +588,29 @@ fun SettingsRow(icon: ImageVector, title: String, subtitle: String, showArrow: B
 }
 
 @Composable
-fun SettingsRowSwitch(icon: ImageVector, title: String, subtitle: String, checked: Boolean, enabled: Boolean = true, onDisabledClick: () -> Unit = {}, shape: androidx.compose.ui.graphics.Shape = RoundedCornerShape(24.dp), onCheckedChange: (Boolean) -> Unit = {}) {
-    Card(shape = shape, colors = CardDefaults.cardColors(containerColor = surfaceContainerHighDark), modifier = Modifier.fillMaxWidth().clickable {
-        if (!enabled) onDisabledClick() else onCheckedChange(!checked)
-    }) {
+fun SettingsRowSwitch(
+    icon: ImageVector, title: String, subtitle: String, checked: Boolean, enabled: Boolean = true,
+    topStart: androidx.compose.ui.unit.Dp = 24.dp, topEnd: androidx.compose.ui.unit.Dp = 24.dp,
+    bottomStart: androidx.compose.ui.unit.Dp = 24.dp, bottomEnd: androidx.compose.ui.unit.Dp = 24.dp,
+    onDisabledClick: () -> Unit = {}, onCheckedChange: (Boolean) -> Unit = {}
+) {
+    val interactionSource = remember { androidx.compose.foundation.interaction.MutableInteractionSource() }
+    val isPressed by interactionSource.collectIsPressedAsState()
+    
+    val aTopStart by androidx.compose.animation.core.animateDpAsState(if (isPressed) 24.dp else topStart, label = "")
+    val aTopEnd by androidx.compose.animation.core.animateDpAsState(if (isPressed) 24.dp else topEnd, label = "")
+    val aBottomStart by androidx.compose.animation.core.animateDpAsState(if (isPressed) 24.dp else bottomStart, label = "")
+    val aBottomEnd by androidx.compose.animation.core.animateDpAsState(if (isPressed) 24.dp else bottomEnd, label = "")
+
+    Card(
+        shape = RoundedCornerShape(aTopStart, aTopEnd, aBottomStart, aBottomEnd),
+        colors = CardDefaults.cardColors(containerColor = surfaceContainerHighDark),
+        modifier = Modifier.fillMaxWidth().clickable(
+            interactionSource = interactionSource,
+            indication = androidx.compose.foundation.LocalIndication.current,
+            onClick = { if (!enabled) onDisabledClick() else onCheckedChange(!checked) }
+        )
+    ) {
         Row(modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp).fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
             Icon(icon, contentDescription = null, tint = if (enabled) onSurfaceVariantDark else onSurfaceVariantDark.copy(alpha = 0.5f))
             Spacer(modifier = Modifier.width(16.dp))

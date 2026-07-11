@@ -12,5 +12,5 @@ dependencyResolutionManagement {
         mavenCentral()
     }
 }
-rootProject.name = "StrictClock"
+rootProject.name = "Mascot"
 include(":app")

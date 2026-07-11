@@ -72,14 +72,24 @@ fun AboutScreen(onBack: () -> Unit) {
             Spacer(modifier = Modifier.height(16.dp))
             
             Text(
-                text = "mastco",
+                text = "mascot",
                 fontSize = 28.sp,
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.onSurface
             )
             
+            val currentContext = LocalContext.current
+            val versionName = remember {
+                try {
+                    val packageInfo = currentContext.packageManager.getPackageInfo(currentContext.packageName, 0)
+                    packageInfo.versionName ?: "Unknown"
+                } catch (e: Exception) {
+                    "Unknown"
+                }
+            }
+
             Text(
-                text = "Version 1.0.0",
+                text = "Version $versionName",
                 fontSize = 14.sp,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -94,7 +104,7 @@ fun AboutScreen(onBack: () -> Unit) {
                     Text("About the App", fontSize = 18.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurface)
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(
-                        text = "mastco is an open-source productivity alarm app designed to force you out of bed with strict challenge tasks such as QR scanning, Math problems, and on-device AI Object recognition.",
+                        text = "mascot is an open-source productivity alarm app designed to force you out of bed with strict challenge tasks such as QR scanning, Math problems, and on-device AI Object recognition.",
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         lineHeight = 22.sp
                     )

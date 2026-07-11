@@ -16,7 +16,7 @@ object UpdateChecker {
     suspend fun check(context: Context, currentVersionName: String) {
         withContext(Dispatchers.IO) {
             try {
-                val url = URL("https://api.github.com/repos/Hotaro26/Mastco/releases/latest")
+                val url = URL("https://api.github.com/repos/Hotaro26/Mascot/releases/latest")
                 val connection = url.openConnection() as HttpURLConnection
                 connection.requestMethod = "GET"
                 connection.connectTimeout = 5000
@@ -38,7 +38,7 @@ object UpdateChecker {
                         Handler(Looper.getMainLooper()).post {
                             AlertDialog.Builder(context)
                                 .setTitle("Update Available")
-                                .setMessage("A new version of mastco (v$latestVersion) is available! Would you like to download it?")
+                                .setMessage("A new version of mascot (v$latestVersion) is available! Would you like to download it?")
                                 .setPositiveButton("Update") { _, _ ->
                                     val intent = Intent(Intent.ACTION_VIEW, Uri.parse(htmlUrl))
                                     context.startActivity(intent)

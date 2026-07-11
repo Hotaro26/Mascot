@@ -12,8 +12,8 @@ android {
         applicationId = "com.hotaro.strictclock"
         minSdk = 26
         targetSdk = 34
-        versionCode = 2
-        versionName = "1.1"
+        versionCode = 3
+        versionName = "1.2"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
             useSupportLibrary = true
@@ -35,7 +35,8 @@ android {
     buildTypes {
         release {
             signingConfig = signingConfigs.getByName("release")
-            isMinifyEnabled = false
+            isMinifyEnabled = true
+            isShrinkResources = true
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
         }
     }
@@ -84,11 +85,11 @@ dependencies {
     implementation("androidx.camera:camera-lifecycle:${camerax_version}")
     implementation("androidx.camera:camera-view:${camerax_version}")
     
-    // ML Kit Barcode Scanning
-    implementation("com.google.mlkit:barcode-scanning:17.2.0")
+    // ML Kit Barcode Scanning (Unbundled)
+    implementation("com.google.android.gms:play-services-mlkit-barcode-scanning:18.3.0")
     
-    // ML Kit Image Labeling (Bundled)
-    implementation("com.google.mlkit:image-labeling:17.0.9")
+    // ML Kit Image Labeling (Unbundled)
+    implementation("com.google.android.gms:play-services-mlkit-image-labeling:16.0.8")
     
     // DataStore Preferences
     implementation("androidx.datastore:datastore-preferences:1.0.0")

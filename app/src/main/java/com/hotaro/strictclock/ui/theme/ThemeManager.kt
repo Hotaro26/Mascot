@@ -50,4 +50,34 @@ object ThemeManager {
             setAmoled(false)
         }
     }
+
+    private val _aiStatus = MutableStateFlow("Checking...")
+    val aiStatus: StateFlow<String> = _aiStatus.asStateFlow()
+
+    fun checkAiStatus(context: android.content.Context) {
+        try {
+            val moduleInstallClient = com.google.android.gms.common.moduleinstall.ModuleInstall.getClient(context)
+            val optionalModuleApi = com.google.mlkit.vision.barcode.BarcodeScanning.getClient()
+            moduleInstallClient.areModulesAvailable(optionalModuleApi)
+                .addOnSuccessListener { response ->
+                    if (response.areModulesAvailable()) {
+                        _aiStatus.value = "Ready and Verified"
+                    } else {
+                        _aiStatus.value = "Downloading AI Models..."
+                        val request = com.google.android.gms.common.moduleinstall.ModuleInstallRequest.newBuilder()
+                            .addApi(optionalModuleApi)
+                            .build()
+                        moduleInstallClient.installModules(request)
+                            .addOnSuccessListener {
+                                _aiStatus.value = "Ready and Verified"
+                            }
+                    }
+                }
+                .addOnFailureListener {
+                    _aiStatus.value = "Play Services Error"
+                }
+        } catch (e: Exception) {
+            _aiStatus.value = "Error checking AI"
+        }
+    }
 }

@@ -35,7 +35,7 @@ class TimerService : Service() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val channel = NotificationChannel(
                 "timer_channel",
-                "mastco Timer",
+                "mascot Timer",
                 NotificationManager.IMPORTANCE_LOW
             )
             notificationManager?.createNotificationChannel(channel)
@@ -69,6 +69,12 @@ class TimerService : Service() {
     private fun pauseTimer() {
         TimerManager.setRunning(false)
         scope.coroutineContext.cancelChildren()
+        
+        // Update notification immediately on pause
+        val pendingIntent = PendingIntent.getActivity(
+            this, 0, Intent(this, MainActivity::class.java), PendingIntent.FLAG_IMMUTABLE
+        )
+        notificationManager?.notify(1002, buildNotification(TimerManager.timeRemaining.value, TimerManager.maxTime.value, pendingIntent))
     }
 
     private fun resumeTimer() {
@@ -92,7 +98,10 @@ class TimerService : Service() {
     private fun resetTimer() {
         pauseTimer()
         TimerManager.updateTime(TimerManager.maxTime.value)
-        resumeTimer()
+        val pendingIntent = PendingIntent.getActivity(
+            this, 0, Intent(this, MainActivity::class.java), PendingIntent.FLAG_IMMUTABLE
+        )
+        notificationManager?.notify(1002, buildNotification(TimerManager.maxTime.value, TimerManager.maxTime.value, pendingIntent))
     }
 
     private fun startCounting() {
@@ -140,14 +149,41 @@ class TimerService : Service() {
 
         val progress = if (maxMs > 0) (remainingMs.toFloat() / maxMs.toFloat() * 100).toInt() else 0
 
-        return NotificationCompat.Builder(this, "timer_channel")
+        val builder = NotificationCompat.Builder(this, "timer_channel")
             .setContentTitle("Timer: $timeStr")
             .setContentText("Time remaining")
             .setSmallIcon(android.R.drawable.ic_menu_recent_history)
             .setProgress(100, progress, false)
             .setContentIntent(pendingIntent)
             .setOngoing(true)
-            .build()
+            .setOnlyAlertOnce(true)
+
+        val stopIntent = Intent(this, TimerService::class.java).setAction(ACTION_STOP)
+        val stopPending = PendingIntent.getService(this, 0, stopIntent, PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT)
+        
+        if (TimerManager.isRunning.value) {
+            val pauseIntent = Intent(this, TimerService::class.java).setAction(ACTION_PAUSE)
+            val pausePending = PendingIntent.getService(this, 1, pauseIntent, PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT)
+            
+            val addIntent = Intent(this, TimerService::class.java).setAction(ACTION_ADD_MINUTE)
+            val addPending = PendingIntent.getService(this, 2, addIntent, PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT)
+            
+            builder.addAction(android.R.drawable.ic_media_pause, "Pause", pausePending)
+            builder.addAction(android.R.drawable.ic_menu_add, "+1 Min", addPending)
+        } else {
+            val resumeIntent = Intent(this, TimerService::class.java).setAction(ACTION_RESUME)
+            val resumePending = PendingIntent.getService(this, 3, resumeIntent, PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT)
+            
+            val resetIntent = Intent(this, TimerService::class.java).setAction(ACTION_RESET)
+            val resetPending = PendingIntent.getService(this, 4, resetIntent, PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT)
+            
+            builder.addAction(android.R.drawable.ic_media_play, "Resume", resumePending)
+            builder.addAction(android.R.drawable.ic_menu_revert, "Reset", resetPending)
+        }
+        
+        builder.addAction(android.R.drawable.ic_menu_close_clear_cancel, "Cancel", stopPending)
+
+        return builder.build()
     }
 
     override fun onDestroy() {

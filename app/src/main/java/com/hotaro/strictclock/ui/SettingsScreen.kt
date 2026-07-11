@@ -56,6 +56,11 @@ fun SettingsScreen(
             val prefs = context.getSharedPreferences("strict_clock_prefs", android.content.Context.MODE_PRIVATE)
             val streak = prefs.getInt("wake_up_streak", 0)
             
+            androidx.compose.runtime.LaunchedEffect(Unit) {
+                ThemeManager.checkAiStatus(context)
+            }
+            val aiStatusText by ThemeManager.aiStatus.collectAsState()
+            
             // Top Cards
             Row(modifier = Modifier.fillMaxWidth()) {
                 Card(
@@ -81,7 +86,7 @@ fun SettingsScreen(
                         Icon(Icons.Outlined.AutoAwesome, contentDescription = null, tint = onPrimaryContainerDark, modifier = Modifier.size(28.dp))
                         Spacer(modifier = Modifier.weight(1f))
                         Text("AI Readiness", color = onPrimaryContainerDark.copy(alpha = 0.8f), fontSize = 14.sp)
-                        Text("Bundled Ready", color = onPrimaryContainerDark, fontSize = 16.sp, fontWeight = FontWeight.Medium)
+                        Text(aiStatusText, color = onPrimaryContainerDark, fontSize = 16.sp, fontWeight = FontWeight.Medium)
                     }
                 }
             }
@@ -91,7 +96,7 @@ fun SettingsScreen(
             // Alarm Behavior
             Text("Alarm Behavior", color = onSurfaceDark, fontSize = 16.sp, fontWeight = FontWeight.Medium, modifier = Modifier.padding(start = 8.dp))
             Spacer(modifier = Modifier.height(16.dp))
-            SettingsRow(icon = Icons.Outlined.Snooze, title = "Zen Mode", subtitle = "Manage snoozing", showArrow = true, shape = RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp, bottomStart = 4.dp, bottomEnd = 4.dp), onClick = onNavigateToZenMode)
+            SettingsRow(icon = Icons.Outlined.Snooze, title = "Zen Mode", subtitle = "Manage snoozing", showArrow = true, bottomStart = 4.dp, bottomEnd = 4.dp, onClick = onNavigateToZenMode)
             Spacer(modifier = Modifier.height(2.dp))
             val isAmoled by ThemeManager.isAmoled.collectAsState()
             val themeModeValue = ThemeManager.themeMode.collectAsState().value
@@ -107,7 +112,7 @@ fun SettingsScreen(
                 onDisabledClick = {
                     android.widget.Toast.makeText(context, "AMOLED mode cannot be used in Light mode", android.widget.Toast.LENGTH_SHORT).show()
                 },
-                shape = RoundedCornerShape(topStart = 4.dp, topEnd = 4.dp, bottomStart = 24.dp, bottomEnd = 24.dp), 
+                topStart = 4.dp, topEnd = 4.dp, 
                 onCheckedChange = { ThemeManager.setAmoled(it) }
             )
             
@@ -116,11 +121,11 @@ fun SettingsScreen(
             // Strict Tasks
             Text("Strict Tasks", color = onSurfaceDark, fontSize = 16.sp, fontWeight = FontWeight.Medium, modifier = Modifier.padding(start = 8.dp))
             Spacer(modifier = Modifier.height(16.dp))
-            SettingsRow(icon = Icons.Outlined.Calculate, title = "Math Settings", subtitle = "Customise math challenges", showArrow = true, shape = RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp, bottomStart = 4.dp, bottomEnd = 4.dp), onClick = onNavigateToMathSettings)
+            SettingsRow(icon = Icons.Outlined.Calculate, title = "Math Settings", subtitle = "Customise math challenges", showArrow = true, bottomStart = 4.dp, bottomEnd = 4.dp, onClick = onNavigateToMathSettings)
             Spacer(modifier = Modifier.height(2.dp))
-            SettingsRow(icon = Icons.Outlined.FitnessCenter, title = "Task Difficulty", subtitle = "Intermediate level", showArrow = true, shape = RoundedCornerShape(4.dp))
+            SettingsRow(icon = Icons.Outlined.FitnessCenter, title = "Task Difficulty", subtitle = "Intermediate level", showArrow = true, topStart = 4.dp, topEnd = 4.dp, bottomStart = 4.dp, bottomEnd = 4.dp)
             Spacer(modifier = Modifier.height(2.dp))
-            SettingsRow(icon = Icons.Outlined.QrCodeScanner, title = "QR Management", subtitle = "Manage saved codes", showArrow = true, shape = RoundedCornerShape(topStart = 4.dp, topEnd = 4.dp, bottomStart = 24.dp, bottomEnd = 24.dp), onClick = onNavigateToQrManagement)
+            SettingsRow(icon = Icons.Outlined.QrCodeScanner, title = "QR Management", subtitle = "Manage saved codes", showArrow = true, topStart = 4.dp, topEnd = 4.dp, onClick = onNavigateToQrManagement)
             
             Spacer(modifier = Modifier.height(32.dp))
             
@@ -132,7 +137,7 @@ fun SettingsScreen(
                 title = "Customisation",
                 subtitle = "Input preferences and styles",
                 showArrow = true,
-                shape = RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp, bottomStart = 4.dp, bottomEnd = 4.dp),
+                bottomStart = 4.dp, bottomEnd = 4.dp,
                 onClick = onNavigateToCustomisation
             )
             Spacer(modifier = Modifier.height(2.dp))
@@ -142,7 +147,7 @@ fun SettingsScreen(
                 title = "Color Scheme", 
                 subtitle = activeScheme, 
                 showArrow = true,
-                shape = RoundedCornerShape(4.dp),
+                topStart = 4.dp, topEnd = 4.dp, bottomStart = 4.dp, bottomEnd = 4.dp,
                 onClick = onNavigateToColorScheme
             )
             Spacer(modifier = Modifier.height(2.dp))
@@ -153,7 +158,7 @@ fun SettingsScreen(
                 title = "Theme Mode", 
                 subtitle = themeMode, 
                 showArrow = true,
-                shape = RoundedCornerShape(topStart = 4.dp, topEnd = 4.dp, bottomStart = 24.dp, bottomEnd = 24.dp),
+                topStart = 4.dp, topEnd = 4.dp,
                 onClick = onNavigateToThemeMode
             )
             Spacer(modifier = Modifier.height(32.dp))
@@ -163,7 +168,7 @@ fun SettingsScreen(
             Spacer(modifier = Modifier.height(16.dp))
             SettingsRow(
                 icon = Icons.Outlined.Info, 
-                title = "About mastco", 
+                title = "About mascot", 
                 subtitle = "App version and developer info", 
                 showArrow = true,
                 onClick = onNavigateToAbout
