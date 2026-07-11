@@ -72,106 +72,28 @@ fun StrictClockApp(isWakeUp: Boolean = false, challengeType: String = "None", qr
         factory = AlarmViewModelFactory(app.repository, app.scheduler)
     )
     
-    Scaffold(
-        contentWindowInsets = WindowInsets.systemBars.only(WindowInsetsSides.Horizontal + WindowInsetsSides.Top),
-        bottomBar = {
-            if (currentScreen != "Setup" && currentScreen != "WakeUp" && currentScreen != "Permissions") {
-                NavigationBar(
-                containerColor = surfaceContainerLowDark,
-                tonalElevation = 0.dp
-            ) {
-                NavigationBarItem(
-                    selected = currentScreen == "Clock",
-                    onClick = { currentScreen = "Clock" },
-                    icon = { 
-                        val rotation by androidx.compose.animation.core.animateFloatAsState(
-                            targetValue = if (currentScreen == "Clock") 180f else 0f,
-                            animationSpec = androidx.compose.animation.core.tween(300),
-                            label = "ClockRotation"
-                        )
-                        androidx.compose.animation.Crossfade(targetState = currentScreen == "Clock") { isSelected ->
-                            Icon(
-                                imageVector = if (isSelected) Icons.Filled.Schedule else Icons.Outlined.Schedule, 
-                                contentDescription = "Clock",
-                                modifier = Modifier.graphicsLayer(rotationZ = rotation)
-                            ) 
-                        }
-                    },
-                    label = { Text("Clock") },
-                    colors = NavigationBarItemDefaults.colors(
-                        selectedIconColor = onPrimaryContainerDark,
-                        selectedTextColor = onSurfaceDark,
-                        indicatorColor = primaryContainerDark,
-                        unselectedIconColor = onSurfaceVariantDark,
-                        unselectedTextColor = onSurfaceVariantDark
-                    )
-                )
-                NavigationBarItem(
-                    selected = currentScreen == "Alarms",
-                    onClick = { currentScreen = "Alarms" },
-                    icon = { 
-                        androidx.compose.animation.Crossfade(targetState = currentScreen == "Alarms") { isSelected ->
-                            Icon(if (isSelected) Icons.Filled.Alarm else Icons.Outlined.Alarm, contentDescription = "Alarms") 
-                        }
-                    },
-                    label = { Text("Alarms") },
-                    colors = NavigationBarItemDefaults.colors(
-                        selectedIconColor = onPrimaryContainerDark,
-                        selectedTextColor = onSurfaceDark,
-                        indicatorColor = primaryContainerDark,
-                        unselectedIconColor = onSurfaceVariantDark,
-                        unselectedTextColor = onSurfaceVariantDark
-                    )
-                )
-                NavigationBarItem(
-                    selected = currentScreen == "Timer",
-                    onClick = { currentScreen = "Timer" },
-                    icon = { 
-                        androidx.compose.animation.Crossfade(targetState = currentScreen == "Timer") { isSelected ->
-                            Icon(if (isSelected) Icons.Filled.Timer else Icons.Outlined.Timer, contentDescription = "Timer") 
-                        }
-                    },
-                    label = { Text("Timer") },
-                    colors = NavigationBarItemDefaults.colors(
-                        selectedIconColor = onPrimaryContainerDark,
-                        selectedTextColor = onSurfaceDark,
-                        indicatorColor = primaryContainerDark,
-                        unselectedIconColor = onSurfaceVariantDark,
-                        unselectedTextColor = onSurfaceVariantDark
-                    )
-                )
-                NavigationBarItem(
-                    selected = currentScreen == "Settings",
-                    onClick = { currentScreen = "Settings" },
-                    icon = { 
-                        val rotation by androidx.compose.animation.core.animateFloatAsState(
-                            targetValue = if (currentScreen == "Settings") 180f else 0f,
-                            animationSpec = androidx.compose.animation.core.tween(300),
-                            label = "SettingsRotation"
-                        )
-                        androidx.compose.animation.Crossfade(targetState = currentScreen == "Settings") { isSelected ->
-                            Icon(
-                                imageVector = if (isSelected) Icons.Filled.Settings else Icons.Outlined.Settings, 
-                                contentDescription = "Settings",
-                                modifier = Modifier.graphicsLayer(rotationZ = rotation)
-                            ) 
-                        }
-                    },
-                    label = { Text("Settings") },
-                    colors = NavigationBarItemDefaults.colors(
-                        selectedIconColor = onPrimaryContainerDark,
-                        selectedTextColor = onSurfaceDark,
-                        indicatorColor = primaryContainerDark,
-                        unselectedIconColor = onSurfaceVariantDark,
-                        unselectedTextColor = onSurfaceVariantDark
-                    )
-                )
-              }
+    BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
+        val isTablet = maxWidth >= 600.dp
+        val availableWidth = maxWidth
+        val showNavigation = currentScreen != "Setup" && currentScreen != "WakeUp" && currentScreen != "Permissions"
+        
+        Row(modifier = Modifier.fillMaxSize()) {
+            if (isTablet && showNavigation) {
+                MainNavigationRail(currentScreen = currentScreen, onNavigate = { currentScreen = it })
             }
-        },
-        containerColor = backgroundDark
-    ) { innerPadding ->
-        Box(modifier = Modifier.padding(innerPadding)) {
+            
+            Scaffold(
+                modifier = Modifier.weight(1f),
+                contentWindowInsets = WindowInsets.systemBars.only(WindowInsetsSides.Horizontal + WindowInsetsSides.Top),
+                bottomBar = {
+                    if (!isTablet && showNavigation) {
+                        MainNavigationBar(currentScreen = currentScreen, onNavigate = { currentScreen = it })
+                    }
+                },
+                containerColor = backgroundDark
+            ) { innerPadding ->
+                val horizontalMargin = if (isTablet) availableWidth * 0.1f else 0.dp
+                Box(modifier = Modifier.padding(innerPadding).padding(horizontal = horizontalMargin)) {
             androidx.compose.animation.AnimatedContent(
                 targetState = currentScreen,
                 transitionSpec = {
@@ -281,5 +203,198 @@ fun StrictClockApp(isWakeUp: Boolean = false, challengeType: String = "None", qr
                 }
             }
         }
+        }
+    }
+}
+}
+
+@Composable
+fun MainNavigationBar(currentScreen: String, onNavigate: (String) -> Unit) {
+    NavigationBar(
+        containerColor = surfaceContainerLowDark,
+        tonalElevation = 0.dp
+    ) {
+        NavigationBarItem(
+            selected = currentScreen == "Clock",
+            onClick = { onNavigate("Clock") },
+            icon = { 
+                val rotation by androidx.compose.animation.core.animateFloatAsState(
+                    targetValue = if (currentScreen == "Clock") 180f else 0f,
+                    animationSpec = androidx.compose.animation.core.tween(300),
+                    label = "ClockRotation"
+                )
+                androidx.compose.animation.Crossfade(targetState = currentScreen == "Clock") { isSelected ->
+                    Icon(
+                        imageVector = if (isSelected) Icons.Filled.Schedule else Icons.Outlined.Schedule, 
+                        contentDescription = "Clock",
+                        modifier = Modifier.graphicsLayer(rotationZ = rotation)
+                    ) 
+                }
+            },
+            label = { Text("Clock") },
+            colors = NavigationBarItemDefaults.colors(
+                selectedIconColor = onPrimaryContainerDark,
+                selectedTextColor = onSurfaceDark,
+                indicatorColor = primaryContainerDark,
+                unselectedIconColor = onSurfaceVariantDark,
+                unselectedTextColor = onSurfaceVariantDark
+            )
+        )
+        NavigationBarItem(
+            selected = currentScreen == "Alarms",
+            onClick = { onNavigate("Alarms") },
+            icon = { 
+                androidx.compose.animation.Crossfade(targetState = currentScreen == "Alarms") { isSelected ->
+                    Icon(if (isSelected) Icons.Filled.Alarm else Icons.Outlined.Alarm, contentDescription = "Alarms") 
+                }
+            },
+            label = { Text("Alarms") },
+            colors = NavigationBarItemDefaults.colors(
+                selectedIconColor = onPrimaryContainerDark,
+                selectedTextColor = onSurfaceDark,
+                indicatorColor = primaryContainerDark,
+                unselectedIconColor = onSurfaceVariantDark,
+                unselectedTextColor = onSurfaceVariantDark
+            )
+        )
+        NavigationBarItem(
+            selected = currentScreen == "Timer",
+            onClick = { onNavigate("Timer") },
+            icon = { 
+                androidx.compose.animation.Crossfade(targetState = currentScreen == "Timer") { isSelected ->
+                    Icon(if (isSelected) Icons.Filled.Timer else Icons.Outlined.Timer, contentDescription = "Timer") 
+                }
+            },
+            label = { Text("Timer") },
+            colors = NavigationBarItemDefaults.colors(
+                selectedIconColor = onPrimaryContainerDark,
+                selectedTextColor = onSurfaceDark,
+                indicatorColor = primaryContainerDark,
+                unselectedIconColor = onSurfaceVariantDark,
+                unselectedTextColor = onSurfaceVariantDark
+            )
+        )
+        NavigationBarItem(
+            selected = currentScreen == "Settings",
+            onClick = { onNavigate("Settings") },
+            icon = { 
+                val rotation by androidx.compose.animation.core.animateFloatAsState(
+                    targetValue = if (currentScreen == "Settings") 180f else 0f,
+                    animationSpec = androidx.compose.animation.core.tween(300),
+                    label = "SettingsRotation"
+                )
+                androidx.compose.animation.Crossfade(targetState = currentScreen == "Settings") { isSelected ->
+                    Icon(
+                        imageVector = if (isSelected) Icons.Filled.Settings else Icons.Outlined.Settings, 
+                        contentDescription = "Settings",
+                        modifier = Modifier.graphicsLayer(rotationZ = rotation)
+                    ) 
+                }
+            },
+            label = { Text("Settings") },
+            colors = NavigationBarItemDefaults.colors(
+                selectedIconColor = onPrimaryContainerDark,
+                selectedTextColor = onSurfaceDark,
+                indicatorColor = primaryContainerDark,
+                unselectedIconColor = onSurfaceVariantDark,
+                unselectedTextColor = onSurfaceVariantDark
+            )
+        )
+    }
+}
+
+@Composable
+fun MainNavigationRail(currentScreen: String, onNavigate: (String) -> Unit) {
+    NavigationRail(
+        containerColor = surfaceContainerLowDark
+    ) {
+        Spacer(modifier = Modifier.weight(1f))
+        NavigationRailItem(
+            selected = currentScreen == "Clock",
+            onClick = { onNavigate("Clock") },
+            icon = { 
+                val rotation by androidx.compose.animation.core.animateFloatAsState(
+                    targetValue = if (currentScreen == "Clock") 180f else 0f,
+                    animationSpec = androidx.compose.animation.core.tween(300),
+                    label = "ClockRotation"
+                )
+                androidx.compose.animation.Crossfade(targetState = currentScreen == "Clock") { isSelected ->
+                    Icon(
+                        imageVector = if (isSelected) Icons.Filled.Schedule else Icons.Outlined.Schedule, 
+                        contentDescription = "Clock",
+                        modifier = Modifier.graphicsLayer(rotationZ = rotation)
+                    ) 
+                }
+            },
+            label = { Text("Clock") },
+            colors = NavigationRailItemDefaults.colors(
+                selectedIconColor = onPrimaryContainerDark,
+                selectedTextColor = onSurfaceDark,
+                indicatorColor = primaryContainerDark,
+                unselectedIconColor = onSurfaceVariantDark,
+                unselectedTextColor = onSurfaceVariantDark
+            )
+        )
+        NavigationRailItem(
+            selected = currentScreen == "Alarms",
+            onClick = { onNavigate("Alarms") },
+            icon = { 
+                androidx.compose.animation.Crossfade(targetState = currentScreen == "Alarms") { isSelected ->
+                    Icon(if (isSelected) Icons.Filled.Alarm else Icons.Outlined.Alarm, contentDescription = "Alarms") 
+                }
+            },
+            label = { Text("Alarms") },
+            colors = NavigationRailItemDefaults.colors(
+                selectedIconColor = onPrimaryContainerDark,
+                selectedTextColor = onSurfaceDark,
+                indicatorColor = primaryContainerDark,
+                unselectedIconColor = onSurfaceVariantDark,
+                unselectedTextColor = onSurfaceVariantDark
+            )
+        )
+        NavigationRailItem(
+            selected = currentScreen == "Timer",
+            onClick = { onNavigate("Timer") },
+            icon = { 
+                androidx.compose.animation.Crossfade(targetState = currentScreen == "Timer") { isSelected ->
+                    Icon(if (isSelected) Icons.Filled.Timer else Icons.Outlined.Timer, contentDescription = "Timer") 
+                }
+            },
+            label = { Text("Timer") },
+            colors = NavigationRailItemDefaults.colors(
+                selectedIconColor = onPrimaryContainerDark,
+                selectedTextColor = onSurfaceDark,
+                indicatorColor = primaryContainerDark,
+                unselectedIconColor = onSurfaceVariantDark,
+                unselectedTextColor = onSurfaceVariantDark
+            )
+        )
+        NavigationRailItem(
+            selected = currentScreen == "Settings",
+            onClick = { onNavigate("Settings") },
+            icon = { 
+                val rotation by androidx.compose.animation.core.animateFloatAsState(
+                    targetValue = if (currentScreen == "Settings") 180f else 0f,
+                    animationSpec = androidx.compose.animation.core.tween(300),
+                    label = "SettingsRotation"
+                )
+                androidx.compose.animation.Crossfade(targetState = currentScreen == "Settings") { isSelected ->
+                    Icon(
+                        imageVector = if (isSelected) Icons.Filled.Settings else Icons.Outlined.Settings, 
+                        contentDescription = "Settings",
+                        modifier = Modifier.graphicsLayer(rotationZ = rotation)
+                    ) 
+                }
+            },
+            label = { Text("Settings") },
+            colors = NavigationRailItemDefaults.colors(
+                selectedIconColor = onPrimaryContainerDark,
+                selectedTextColor = onSurfaceDark,
+                indicatorColor = primaryContainerDark,
+                unselectedIconColor = onSurfaceVariantDark,
+                unselectedTextColor = onSurfaceVariantDark
+            )
+        )
+        Spacer(modifier = Modifier.weight(1f))
     }
 }
