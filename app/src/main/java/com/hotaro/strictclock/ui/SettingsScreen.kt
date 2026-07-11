@@ -27,6 +27,7 @@ fun SettingsScreen(
     onNavigateToQrManagement: () -> Unit = {},
     onNavigateToZenMode: () -> Unit = {},
     onNavigateToCustomisation: () -> Unit = {},
+    onNavigateToMathSettings: () -> Unit = {},
     onNavigateToAiReadiness: () -> Unit = {},
     onNavigateToAbout: () -> Unit = {}
 ) {
@@ -100,6 +101,8 @@ fun SettingsScreen(
             // Strict Tasks
             Text("Strict Tasks", color = onSurfaceDark, fontSize = 16.sp, fontWeight = FontWeight.Medium)
             Spacer(modifier = Modifier.height(16.dp))
+            SettingsRow(icon = Icons.Outlined.Calculate, title = "Math Settings", subtitle = "Customise math challenges", showArrow = true, onClick = onNavigateToMathSettings)
+            Spacer(modifier = Modifier.height(8.dp))
             SettingsRow(icon = Icons.Outlined.FitnessCenter, title = "Task Difficulty", subtitle = "Intermediate level", showArrow = true)
             Spacer(modifier = Modifier.height(8.dp))
             SettingsRow(icon = Icons.Outlined.QrCodeScanner, title = "QR Management", subtitle = "Manage saved codes", showArrow = true, onClick = onNavigateToQrManagement)

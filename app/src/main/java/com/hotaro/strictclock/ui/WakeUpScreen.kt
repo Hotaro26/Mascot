@@ -95,9 +95,15 @@ fun WakeUpScreen(
 
 @Composable
 fun ColumnScope.MathChallengeView(operations: String, difficulty: String, zenModeEnabled: Boolean, onSnoozeAlarm: () -> Unit, onStopAlarm: () -> Unit) {
+    val context = LocalContext.current
+    val prefs = context.getSharedPreferences("strict_clock_prefs", Context.MODE_PRIVATE)
+    
+    val actualOperations = prefs.getString("math_operations", "Addition,Subtraction") ?: "Addition,Subtraction"
+    val actualDifficulty = prefs.getString("math_difficulty", "Easy") ?: "Easy"
+    
     var problemsSolved by remember { mutableStateOf(0) }
-    val totalProblems = 3
-    var currentProblem by remember { mutableStateOf(MathChallenge.generateProblem(operations, difficulty)) }
+    val totalProblems = prefs.getInt("math_sums", 3)
+    var currentProblem by remember { mutableStateOf(MathChallenge.generateProblem(actualOperations, actualDifficulty)) }
     var answerInput by remember { mutableStateOf("") }
     var showError by remember { mutableStateOf(false) }
 
@@ -169,7 +175,7 @@ fun ColumnScope.MathChallengeView(operations: String, difficulty: String, zenMod
                                                 if (problemsSolved >= totalProblems) {
                                                     onStopAlarm()
                                                 } else {
-                                                    currentProblem = MathChallenge.generateProblem(operations, difficulty)
+                                                    currentProblem = MathChallenge.generateProblem(actualOperations, actualDifficulty)
                                                     answerInput = ""
                                                 }
                                             } else {

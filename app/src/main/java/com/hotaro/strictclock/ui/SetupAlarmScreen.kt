@@ -309,16 +309,9 @@ fun SetupAlarmScreen(viewModel: AlarmViewModel? = null, alarm: AlarmEntity? = nu
                 TaskCard(
                     icon = Icons.Outlined.Calculate, 
                     title = "Math", 
-                    subtitle = if (selectedChallenge == "Math") "$mathDifficulty, ${mathOperations.split(",").size} ops" else "Solve a problem", 
+                    subtitle = "Solve a problem", 
                     modifier = Modifier.weight(1f).clickable {
-                        if (selectedChallenge == "Math") {
-                            showMathConfigDialog = true
-                        } else {
-                            selectedChallenge = "Math"
-                            if (mathOperations.isEmpty() || mathOperations == "Addition,Subtraction") {
-                                showMathConfigDialog = true
-                            }
-                        }
+                        selectedChallenge = "Math"
                     }, 
                     isSelected = selectedChallenge == "Math"
                 )
@@ -402,87 +395,7 @@ fun SetupAlarmScreen(viewModel: AlarmViewModel? = null, alarm: AlarmEntity? = nu
             )
         }
 
-        if (showMathConfigDialog) {
-            var ops by remember { mutableStateOf(mathOperations.split(",").filter { it.isNotEmpty() }.toSet()) }
-            var currentDifficulty by remember { mutableStateOf(mathDifficulty) }
 
-            AlertDialog(
-                onDismissRequest = { 
-                    mathOperations = ops.joinToString(",")
-                    mathDifficulty = currentDifficulty
-                    showMathConfigDialog = false 
-                },
-                title = { Text("Math Settings", color = onSurfaceDark) },
-                text = {
-                    Column {
-                        Text("Operations", fontWeight = FontWeight.Bold, color = onSurfaceDark)
-                        Spacer(modifier = Modifier.height(8.dp))
-                        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                            FilterChip(
-                                selected = ops.contains("Addition"),
-                                onClick = { ops = if (ops.contains("Addition")) ops - "Addition" else ops + "Addition" },
-                                label = { Text("+") }
-                            )
-                            FilterChip(
-                                selected = ops.contains("Subtraction"),
-                                onClick = { ops = if (ops.contains("Subtraction")) ops - "Subtraction" else ops + "Subtraction" },
-                                label = { Text("-") }
-                            )
-                            FilterChip(
-                                selected = ops.contains("Multiplication"),
-                                onClick = { ops = if (ops.contains("Multiplication")) ops - "Multiplication" else ops + "Multiplication" },
-                                label = { Text("×") }
-                            )
-                            FilterChip(
-                                selected = ops.contains("Division"),
-                                onClick = { ops = if (ops.contains("Division")) ops - "Division" else ops + "Division" },
-                                label = { Text("÷") }
-                            )
-                        }
-
-                        Spacer(modifier = Modifier.height(16.dp))
-                        Text("Difficulty", fontWeight = FontWeight.Bold, color = onSurfaceDark)
-                        Spacer(modifier = Modifier.height(8.dp))
-                        SingleChoiceSegmentedButtonRow(modifier = Modifier.fillMaxWidth()) {
-                            SegmentedButton(
-                                selected = currentDifficulty == "Easy",
-                                onClick = { currentDifficulty = "Easy" },
-                                shape = SegmentedButtonDefaults.itemShape(index = 0, count = 3)
-                            ) {
-                                Text("Easy")
-                            }
-                            SegmentedButton(
-                                selected = currentDifficulty == "Medium",
-                                onClick = { currentDifficulty = "Medium" },
-                                shape = SegmentedButtonDefaults.itemShape(index = 1, count = 3)
-                            ) {
-                                Text("Medium")
-                            }
-                            SegmentedButton(
-                                selected = currentDifficulty == "Hard",
-                                onClick = { currentDifficulty = "Hard" },
-                                shape = SegmentedButtonDefaults.itemShape(index = 2, count = 3)
-                            ) {
-                                Text("Hard")
-                            }
-                        }
-                    }
-                },
-                confirmButton = {
-                    TextButton(onClick = { 
-                        if (ops.isEmpty()) ops = setOf("Addition")
-                        mathOperations = ops.joinToString(",")
-                        mathDifficulty = currentDifficulty
-                        showMathConfigDialog = false 
-                    }) {
-                        Text("Save", color = primaryDark)
-                    }
-                },
-                containerColor = surfaceContainerHighDark,
-                titleContentColor = onSurfaceDark,
-                textContentColor = onSurfaceVariantDark
-            )
-        }
         
         if (showQrOptionsDialog) {
             AlertDialog(
@@ -586,10 +499,10 @@ fun SetupAlarmScreen(viewModel: AlarmViewModel? = null, alarm: AlarmEntity? = nu
                     TextButton(onClick = {
                         val data = scannedQrCode!!
                         prefs.edit().putString("main_qr_code", data).apply()
-                        scannedQrCode = data
                         qrCodeData = data
                         qrCodeName = "Scanned Code"
                         showQrScanner = false
+                        scannedQrCode = null
                     }) {
                         Text("Save", color = primaryDark)
                     }
