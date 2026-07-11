@@ -23,6 +23,9 @@ class AlarmScheduler(private val context: Context) {
             putExtra("VIBRATION_ENABLED", alarm.vibrationEnabled)
             putExtra("QR_CODE_DATA", alarm.qrCodeData)
             putExtra("QR_CODE_NAME", alarm.qrCodeName)
+            putExtra("CAMERA_OBJECT", alarm.cameraObject)
+            putExtra("MATH_OPERATIONS", alarm.mathOperations)
+            putExtra("MATH_DIFFICULTY", alarm.mathDifficulty)
         }
 
         val pendingIntent = PendingIntent.getBroadcast(

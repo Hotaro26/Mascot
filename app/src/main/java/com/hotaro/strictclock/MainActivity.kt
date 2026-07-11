@@ -32,6 +32,8 @@ class MainActivity : ComponentActivity() {
         val qrCodeData = intent.getStringExtra("QR_CODE_DATA")?.takeIf { it.isNotEmpty() } ?: if (AlarmService.isRinging) AlarmService.currentQrCodeData else ""
         val qrCodeName = intent.getStringExtra("QR_CODE_NAME")?.takeIf { it.isNotEmpty() } ?: if (AlarmService.isRinging) AlarmService.currentQrCodeName else ""
         val cameraObject = intent.getStringExtra("CAMERA_OBJECT")?.takeIf { it.isNotEmpty() } ?: if (AlarmService.isRinging) AlarmService.currentCameraObject else ""
+        val mathOperations = intent.getStringExtra("MATH_OPERATIONS")?.takeIf { it.isNotEmpty() } ?: if (AlarmService.isRinging) AlarmService.currentMathOperations else ""
+        val mathDifficulty = intent.getStringExtra("MATH_DIFFICULTY")?.takeIf { it.isNotEmpty() } ?: if (AlarmService.isRinging) AlarmService.currentMathDifficulty else ""
 
         if (isWakeUp) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) {
@@ -54,7 +56,7 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    StrictClockApp(isWakeUp = isWakeUp, challengeType = challengeType, qrCodeData = qrCodeData, qrCodeName = qrCodeName, cameraObject = cameraObject)
+                    StrictClockApp(isWakeUp = isWakeUp, challengeType = challengeType, qrCodeData = qrCodeData, qrCodeName = qrCodeName, cameraObject = cameraObject, mathOperations = mathOperations, mathDifficulty = mathDifficulty)
                 }
             }
         }

@@ -31,6 +31,8 @@ class AlarmService : Service() {
         var currentAlarmId = -1
         var currentSoundUri = ""
         var currentVibrationEnabled = true
+        var currentMathOperations = ""
+        var currentMathDifficulty = ""
     }
 
     override fun onCreate() {
@@ -58,6 +60,8 @@ class AlarmService : Service() {
         val qrCodeData = intent?.getStringExtra("QR_CODE_DATA") ?: ""
         val qrCodeName = intent?.getStringExtra("QR_CODE_NAME") ?: ""
         val cameraObject = intent?.getStringExtra("CAMERA_OBJECT") ?: ""
+        val mathOperations = intent?.getStringExtra("MATH_OPERATIONS") ?: ""
+        val mathDifficulty = intent?.getStringExtra("MATH_DIFFICULTY") ?: ""
 
         isRinging = true
         currentAlarmId = alarmId
@@ -67,6 +71,8 @@ class AlarmService : Service() {
         currentCameraObject = cameraObject
         currentSoundUri = soundUriStr
         currentVibrationEnabled = vibrationEnabled
+        currentMathOperations = mathOperations
+        currentMathDifficulty = mathDifficulty
 
         // Full screen intent to launch WakeUp UI
         val fullScreenIntent = Intent(this, MainActivity::class.java).apply {
@@ -79,6 +85,8 @@ class AlarmService : Service() {
             putExtra("QR_CODE_DATA", qrCodeData)
             putExtra("QR_CODE_NAME", qrCodeName)
             putExtra("CAMERA_OBJECT", cameraObject)
+            putExtra("MATH_OPERATIONS", mathOperations)
+            putExtra("MATH_DIFFICULTY", mathDifficulty)
         }
 
         val fullScreenPendingIntent = PendingIntent.getActivity(

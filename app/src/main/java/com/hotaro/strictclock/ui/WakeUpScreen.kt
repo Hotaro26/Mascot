@@ -36,6 +36,8 @@ fun WakeUpScreen(
     qrCodeData: String = "", 
     qrCodeName: String = "", 
     cameraObject: String = "",
+    mathOperations: String = "Addition,Subtraction",
+    mathDifficulty: String = "Easy",
     onStopAlarm: () -> Unit = {},
     onSnoozeAlarm: () -> Unit = {}
 ) {
@@ -81,7 +83,7 @@ fun WakeUpScreen(
             Spacer(modifier = Modifier.height(24.dp))
             
             when (challengeType) {
-                "Math" -> MathChallengeView(zenModeEnabled, onSnoozeAlarm, onStopAlarm)
+                "Math" -> MathChallengeView(mathOperations, mathDifficulty, zenModeEnabled, onSnoozeAlarm, onStopAlarm)
                 "QR Code" -> QRChallengeView(qrCodeData, qrCodeName, zenModeEnabled, onSnoozeAlarm, onStopAlarm)
                 "QR" -> QRChallengeView(qrCodeData, qrCodeName, zenModeEnabled, onSnoozeAlarm, onStopAlarm)
                 "Camera" -> CameraChallengeViewWrapper(cameraObject, zenModeEnabled, onSnoozeAlarm, onStopAlarm)
@@ -92,15 +94,15 @@ fun WakeUpScreen(
 }
 
 @Composable
-fun MathChallengeView(zenModeEnabled: Boolean, onSnoozeAlarm: () -> Unit, onStopAlarm: () -> Unit) {
+fun ColumnScope.MathChallengeView(operations: String, difficulty: String, zenModeEnabled: Boolean, onSnoozeAlarm: () -> Unit, onStopAlarm: () -> Unit) {
     var problemsSolved by remember { mutableStateOf(0) }
     val totalProblems = 3
-    var currentProblem by remember { mutableStateOf(MathChallenge.generateProblem()) }
+    var currentProblem by remember { mutableStateOf(MathChallenge.generateProblem(operations, difficulty)) }
     var answerInput by remember { mutableStateOf("") }
     var showError by remember { mutableStateOf(false) }
 
     Card(
-        modifier = Modifier.fillMaxWidth().fillMaxHeight(0.7f),
+        modifier = Modifier.fillMaxWidth().weight(1f),
         shape = RoundedCornerShape(24.dp),
         colors = CardDefaults.cardColors(containerColor = surfaceContainerHighDark)
     ) {
@@ -125,44 +127,71 @@ fun MathChallengeView(zenModeEnabled: Boolean, onSnoozeAlarm: () -> Unit, onStop
             Text(currentProblem.expression + " = ?", fontSize = 48.sp, color = onSurfaceDark, fontWeight = FontWeight.Bold)
             Spacer(modifier = Modifier.height(24.dp))
             
-            OutlinedTextField(
-                value = answerInput,
-                onValueChange = { answerInput = it; showError = false },
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                textStyle = LocalTextStyle.current.copy(fontSize = 32.sp, textAlign = TextAlign.Center),
-                modifier = Modifier.width(150.dp),
-                isError = showError,
-                singleLine = true,
-                colors = OutlinedTextFieldDefaults.colors(
-                    focusedBorderColor = primaryDark,
-                    unfocusedBorderColor = outlineDark,
-                    focusedTextColor = primaryDark,
-                    unfocusedTextColor = onSurfaceDark
+            Box(
+                modifier = Modifier
+                    .width(180.dp)
+                    .height(64.dp)
+                    .background(if (showError) errorDark.copy(alpha = 0.2f) else backgroundDark, RoundedCornerShape(16.dp))
+                    .border(2.dp, if (showError) errorDark else outlineDark, RoundedCornerShape(16.dp)),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = answerInput.ifEmpty { "..." },
+                    fontSize = 32.sp,
+                    color = if (showError) errorDark else if (answerInput.isEmpty()) onSurfaceVariantDark else primaryDark,
+                    fontWeight = FontWeight.Bold
                 )
-            )
+            }
             
             Spacer(modifier = Modifier.weight(1f))
             
-            Button(
-                onClick = { 
-                    val ans = answerInput.toIntOrNull()
-                    if (ans == currentProblem.answer) {
-                        problemsSolved++
-                        if (problemsSolved >= totalProblems) {
-                            onStopAlarm()
-                        } else {
-                            currentProblem = MathChallenge.generateProblem()
-                            answerInput = ""
+            // Numeric Keypad
+            Column(modifier = Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                val padKeys = listOf(
+                    listOf("1", "2", "3"),
+                    listOf("4", "5", "6"),
+                    listOf("7", "8", "9"),
+                    listOf("Del", "0", "OK")
+                )
+                
+                for (row in padKeys) {
+                    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        for (key in row) {
+                            Button(
+                                onClick = {
+                                    showError = false
+                                    when (key) {
+                                        "Del" -> if (answerInput.isNotEmpty()) answerInput = answerInput.dropLast(1)
+                                        "OK" -> {
+                                            val ans = answerInput.toIntOrNull()
+                                            if (ans == currentProblem.answer) {
+                                                problemsSolved++
+                                                if (problemsSolved >= totalProblems) {
+                                                    onStopAlarm()
+                                                } else {
+                                                    currentProblem = MathChallenge.generateProblem(operations, difficulty)
+                                                    answerInput = ""
+                                                }
+                                            } else {
+                                                showError = true
+                                                answerInput = ""
+                                            }
+                                        }
+                                        else -> if (answerInput.length < 5) answerInput += key
+                                    }
+                                },
+                                modifier = Modifier.weight(1f).aspectRatio(1.5f),
+                                colors = ButtonDefaults.buttonColors(
+                                    containerColor = if (key == "OK") primaryDark else surfaceContainerHighestDark,
+                                    contentColor = if (key == "OK") onPrimaryDark else onSurfaceDark
+                                ),
+                                shape = RoundedCornerShape(16.dp)
+                            ) {
+                                Text(key, fontSize = 24.sp, fontWeight = FontWeight.Bold)
+                            }
                         }
-                    } else {
-                        showError = true
                     }
-                },
-                modifier = Modifier.fillMaxWidth().height(64.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = primaryDark, contentColor = onPrimaryDark),
-                shape = RoundedCornerShape(32.dp)
-            ) {
-                Text("Submit", fontSize = 18.sp, fontWeight = FontWeight.Medium)
+                }
             }
         }
     }

@@ -27,7 +27,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
 
 @Composable
-fun StrictClockApp(isWakeUp: Boolean = false, challengeType: String = "None", qrCodeData: String = "", qrCodeName: String = "", cameraObject: String = "") {
+fun StrictClockApp(isWakeUp: Boolean = false, challengeType: String = "None", qrCodeData: String = "", qrCodeName: String = "", cameraObject: String = "", mathOperations: String = "", mathDifficulty: String = "") {
     val context = LocalContext.current
     val hasAllPermissions = remember {
         val hasNotif = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) ContextCompat.checkSelfPermission(context, android.Manifest.permission.POST_NOTIFICATIONS) == android.content.pm.PackageManager.PERMISSION_GRANTED else true
@@ -43,6 +43,8 @@ fun StrictClockApp(isWakeUp: Boolean = false, challengeType: String = "None", qr
     var activeQrCodeData by remember { mutableStateOf(qrCodeData) }
     var activeQrCodeName by remember { mutableStateOf(qrCodeName) }
     var activeCameraObject by remember { mutableStateOf(cameraObject) }
+    var activeMathOperations by remember { mutableStateOf(mathOperations) }
+    var activeMathDifficulty by remember { mutableStateOf(mathDifficulty) }
     var activeSoundUri by remember { mutableStateOf("") }
     var activeVibrationEnabled by remember { mutableStateOf(true) }
 
@@ -56,6 +58,8 @@ fun StrictClockApp(isWakeUp: Boolean = false, challengeType: String = "None", qr
                     activeQrCodeData = com.hotaro.strictclock.service.AlarmService.currentQrCodeData
                     activeQrCodeName = com.hotaro.strictclock.service.AlarmService.currentQrCodeName
                     activeCameraObject = com.hotaro.strictclock.service.AlarmService.currentCameraObject
+                    activeMathOperations = com.hotaro.strictclock.service.AlarmService.currentMathOperations
+                    activeMathDifficulty = com.hotaro.strictclock.service.AlarmService.currentMathDifficulty
                     activeSoundUri = com.hotaro.strictclock.service.AlarmService.currentSoundUri
                     activeVibrationEnabled = com.hotaro.strictclock.service.AlarmService.currentVibrationEnabled
                 }
@@ -132,6 +136,8 @@ fun StrictClockApp(isWakeUp: Boolean = false, challengeType: String = "None", qr
                             qrCodeData = activeQrCodeData, 
                             qrCodeName = activeQrCodeName,
                             cameraObject = activeCameraObject,
+                            mathOperations = activeMathOperations,
+                            mathDifficulty = activeMathDifficulty,
                             onStopAlarm = {
                                 val serviceIntent = android.content.Intent(context, com.hotaro.strictclock.service.AlarmService::class.java)
                                 context.stopService(serviceIntent)
@@ -165,6 +171,8 @@ fun StrictClockApp(isWakeUp: Boolean = false, challengeType: String = "None", qr
                                     putExtra("QR_CODE_DATA", activeQrCodeData)
                                     putExtra("QR_CODE_NAME", activeQrCodeName)
                                     putExtra("CAMERA_OBJECT", activeCameraObject)
+                                    putExtra("MATH_OPERATIONS", activeMathOperations)
+                                    putExtra("MATH_DIFFICULTY", activeMathDifficulty)
                                 }
                                 
                                 val pendingIntent = android.app.PendingIntent.getBroadcast(

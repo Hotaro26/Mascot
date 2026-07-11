@@ -17,5 +17,7 @@ data class AlarmEntity(
     val vibrationEnabled: Boolean = true,
     val qrCodeData: String = "",
     val qrCodeName: String = "",
-    val cameraObject: String = ""
+    val cameraObject: String = "",
+    val mathOperations: String = "Addition,Subtraction",
+    val mathDifficulty: String = "Easy"
 )

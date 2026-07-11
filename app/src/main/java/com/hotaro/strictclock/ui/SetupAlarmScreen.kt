@@ -59,6 +59,8 @@ fun SetupAlarmScreen(viewModel: AlarmViewModel? = null, alarm: AlarmEntity? = nu
     var qrCodeData by remember { mutableStateOf(alarm?.qrCodeData ?: "") }
     var qrCodeName by remember { mutableStateOf(alarm?.qrCodeName ?: "") }
     var cameraObject by remember { mutableStateOf(alarm?.cameraObject ?: "") }
+    var mathOperations by remember { mutableStateOf(alarm?.mathOperations ?: "Addition,Subtraction") }
+    var mathDifficulty by remember { mutableStateOf(alarm?.mathDifficulty ?: "Easy") }
 
     var showQrScanner by remember { mutableStateOf(false) }
     var scannedQrCode by remember { mutableStateOf<String?>(null) }
@@ -66,6 +68,7 @@ fun SetupAlarmScreen(viewModel: AlarmViewModel? = null, alarm: AlarmEntity? = nu
     var showSelectQrDialog by remember { mutableStateOf(false) }
     var showCameraObjectDialog by remember { mutableStateOf(false) }
     var showStrictModeDialog by remember { mutableStateOf(false) }
+    var showMathConfigDialog by remember { mutableStateOf(false) }
     val context = LocalContext.current
     val savedQrs = remember { loadQrs(context) }
     val ringtoneLauncher = rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
@@ -111,6 +114,10 @@ fun SetupAlarmScreen(viewModel: AlarmViewModel? = null, alarm: AlarmEntity? = nu
                                 showStrictModeDialog = true
                                 return@Button
                             }
+                            if (selectedChallenge == "Math" && mathOperations.isEmpty()) {
+                                showStrictModeDialog = true
+                                return@Button
+                            }
                             val newAlarm = AlarmEntity(
                                 id = alarm?.id ?: 0,
                                 timeHour = timePickerState.hour,
@@ -123,7 +130,9 @@ fun SetupAlarmScreen(viewModel: AlarmViewModel? = null, alarm: AlarmEntity? = nu
                                 vibrationEnabled = vibrationEnabled,
                                 qrCodeData = if (selectedChallenge == "QR Code") qrCodeData else "",
                                 qrCodeName = if (selectedChallenge == "QR Code") qrCodeName else "",
-                                cameraObject = if (selectedChallenge == "Camera") cameraObject else ""
+                                cameraObject = if (selectedChallenge == "Camera") cameraObject else "",
+                                mathOperations = if (selectedChallenge == "Math") mathOperations else "Addition,Subtraction",
+                                mathDifficulty = if (selectedChallenge == "Math") mathDifficulty else "Easy"
                             )
                             if (alarm == null) {
                                 viewModel?.insert(newAlarm)
@@ -300,8 +309,17 @@ fun SetupAlarmScreen(viewModel: AlarmViewModel? = null, alarm: AlarmEntity? = nu
                 TaskCard(
                     icon = Icons.Outlined.Calculate, 
                     title = "Math", 
-                    subtitle = "Coming later", 
-                    modifier = Modifier.weight(1f), 
+                    subtitle = if (selectedChallenge == "Math") "$mathDifficulty, ${mathOperations.split(",").size} ops" else "Solve a problem", 
+                    modifier = Modifier.weight(1f).clickable {
+                        if (selectedChallenge == "Math") {
+                            showMathConfigDialog = true
+                        } else {
+                            selectedChallenge = "Math"
+                            if (mathOperations.isEmpty() || mathOperations == "Addition,Subtraction") {
+                                showMathConfigDialog = true
+                            }
+                        }
+                    }, 
                     isSelected = selectedChallenge == "Math"
                 )
             }
@@ -381,6 +399,88 @@ fun SetupAlarmScreen(viewModel: AlarmViewModel? = null, alarm: AlarmEntity? = nu
                         Text("Save", color = primaryDark)
                     }
                 }
+            )
+        }
+
+        if (showMathConfigDialog) {
+            val ops = mathOperations.split(",").filter { it.isNotEmpty() }.toMutableSet()
+            var currentDifficulty by remember { mutableStateOf(mathDifficulty) }
+
+            AlertDialog(
+                onDismissRequest = { 
+                    mathOperations = ops.joinToString(",")
+                    mathDifficulty = currentDifficulty
+                    showMathConfigDialog = false 
+                },
+                title = { Text("Math Settings", color = onSurfaceDark) },
+                text = {
+                    Column {
+                        Text("Operations", fontWeight = FontWeight.Bold, color = onSurfaceDark)
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                            FilterChip(
+                                selected = ops.contains("Addition"),
+                                onClick = { if (ops.contains("Addition")) ops.remove("Addition") else ops.add("Addition") },
+                                label = { Text("+") }
+                            )
+                            FilterChip(
+                                selected = ops.contains("Subtraction"),
+                                onClick = { if (ops.contains("Subtraction")) ops.remove("Subtraction") else ops.add("Subtraction") },
+                                label = { Text("-") }
+                            )
+                            FilterChip(
+                                selected = ops.contains("Multiplication"),
+                                onClick = { if (ops.contains("Multiplication")) ops.remove("Multiplication") else ops.add("Multiplication") },
+                                label = { Text("×") }
+                            )
+                            FilterChip(
+                                selected = ops.contains("Division"),
+                                onClick = { if (ops.contains("Division")) ops.remove("Division") else ops.add("Division") },
+                                label = { Text("÷") }
+                            )
+                        }
+
+                        Spacer(modifier = Modifier.height(16.dp))
+                        Text("Difficulty", fontWeight = FontWeight.Bold, color = onSurfaceDark)
+                        Spacer(modifier = Modifier.height(8.dp))
+                        SingleChoiceSegmentedButtonRow(modifier = Modifier.fillMaxWidth()) {
+                            SegmentedButton(
+                                selected = currentDifficulty == "Easy",
+                                onClick = { currentDifficulty = "Easy" },
+                                shape = SegmentedButtonDefaults.itemShape(index = 0, count = 3)
+                            ) {
+                                Text("Easy")
+                            }
+                            SegmentedButton(
+                                selected = currentDifficulty == "Medium",
+                                onClick = { currentDifficulty = "Medium" },
+                                shape = SegmentedButtonDefaults.itemShape(index = 1, count = 3)
+                            ) {
+                                Text("Medium")
+                            }
+                            SegmentedButton(
+                                selected = currentDifficulty == "Hard",
+                                onClick = { currentDifficulty = "Hard" },
+                                shape = SegmentedButtonDefaults.itemShape(index = 2, count = 3)
+                            ) {
+                                Text("Hard")
+                            }
+                        }
+                    }
+                },
+                confirmButton = {
+                    TextButton(onClick = { 
+                        if (ops.isEmpty()) ops.add("Addition")
+                        mathOperations = ops.joinToString(",")
+                        mathDifficulty = currentDifficulty
+                        showMathConfigDialog = false 
+                    }) {
+                        Text("Save", color = primaryDark)
+                    }
+                },
+                containerColor = surfaceContainerHighDark,
+                titleContentColor = onSurfaceDark,
+                textContentColor = onSurfaceVariantDark
             )
         }
         
