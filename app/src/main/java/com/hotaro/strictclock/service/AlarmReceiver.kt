@@ -13,6 +13,7 @@ class AlarmReceiver : BroadcastReceiver() {
         val vibrationEnabled = intent.getBooleanExtra("VIBRATION_ENABLED", true)
         val qrCodeData = intent.getStringExtra("QR_CODE_DATA") ?: ""
         val qrCodeName = intent.getStringExtra("QR_CODE_NAME") ?: ""
+        val cameraObject = intent.getStringExtra("CAMERA_OBJECT") ?: ""
 
         val serviceIntent = Intent(context, AlarmService::class.java).apply {
             putExtra("ALARM_ID", alarmId)
@@ -21,6 +22,7 @@ class AlarmReceiver : BroadcastReceiver() {
             putExtra("VIBRATION_ENABLED", vibrationEnabled)
             putExtra("QR_CODE_DATA", qrCodeData)
             putExtra("QR_CODE_NAME", qrCodeName)
+            putExtra("CAMERA_OBJECT", cameraObject)
         }
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {

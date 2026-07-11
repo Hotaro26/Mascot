@@ -26,7 +26,8 @@ fun SettingsScreen(
     onNavigateToThemeMode: () -> Unit = {},
     onNavigateToQrManagement: () -> Unit = {},
     onNavigateToZenMode: () -> Unit = {},
-    onNavigateToCustomisation: () -> Unit = {}
+    onNavigateToCustomisation: () -> Unit = {},
+    onNavigateToAiReadiness: () -> Unit = {}
 ) {
     Scaffold(
         topBar = {
@@ -69,6 +70,7 @@ fun SettingsScreen(
                 }
                 Spacer(modifier = Modifier.width(16.dp))
                 Card(
+                    onClick = onNavigateToAiReadiness,
                     modifier = Modifier.weight(1f).height(140.dp),
                     shape = RoundedCornerShape(24.dp),
                     colors = CardDefaults.cardColors(containerColor = primaryContainerDark)
@@ -77,7 +79,7 @@ fun SettingsScreen(
                         Icon(Icons.Outlined.AutoAwesome, contentDescription = null, tint = onPrimaryContainerDark, modifier = Modifier.size(28.dp))
                         Spacer(modifier = Modifier.weight(1f))
                         Text("AI Readiness", color = onPrimaryContainerDark.copy(alpha = 0.8f), fontSize = 14.sp)
-                        Text("Optimal", color = onPrimaryContainerDark, fontSize = 18.sp, fontWeight = FontWeight.Medium)
+                        Text("Bundled Ready", color = onPrimaryContainerDark, fontSize = 16.sp, fontWeight = FontWeight.Medium)
                     }
                 }
             }

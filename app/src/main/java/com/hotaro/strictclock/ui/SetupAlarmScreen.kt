@@ -55,11 +55,13 @@ fun SetupAlarmScreen(viewModel: AlarmViewModel? = null, alarm: AlarmEntity? = nu
     var showRepeatDialog by remember { mutableStateOf(false) }
     var qrCodeData by remember { mutableStateOf(alarm?.qrCodeData ?: "") }
     var qrCodeName by remember { mutableStateOf(alarm?.qrCodeName ?: "") }
+    var cameraObject by remember { mutableStateOf(alarm?.cameraObject ?: "") }
 
     var showQrScanner by remember { mutableStateOf(false) }
     var scannedQrCode by remember { mutableStateOf<String?>(null) }
     var showQrOptionsDialog by remember { mutableStateOf(false) }
     var showSelectQrDialog by remember { mutableStateOf(false) }
+    var showCameraObjectDialog by remember { mutableStateOf(false) }
     var showStrictModeDialog by remember { mutableStateOf(false) }
     val context = LocalContext.current
     val savedQrs = remember { loadQrs(context) }
@@ -98,29 +100,34 @@ fun SetupAlarmScreen(viewModel: AlarmViewModel? = null, alarm: AlarmEntity? = nu
                 actions = {
                     Button(
                         onClick = {
-                            if (selectedChallenge == "None" || ((selectedChallenge == "QR" || selectedChallenge == "QR Code") && qrCodeData.isEmpty())) {
+                            if (selectedChallenge == "QR Code" && qrCodeData.isEmpty()) {
                                 showStrictModeDialog = true
-                            } else {
-                                val newAlarm = AlarmEntity(
-                                    id = alarm?.id ?: 0,
-                                    timeHour = timePickerState.hour,
-                                    timeMinute = timePickerState.minute,
-                                    daysOfWeek = repeatDays,
-                                    isActive = true,
-                                    challengeType = selectedChallenge,
-                                    soundName = soundName,
-                                    soundUri = soundUri,
-                                    vibrationEnabled = vibrationEnabled,
-                                    qrCodeData = qrCodeData,
-                                    qrCodeName = qrCodeName
-                                )
-                                if (alarm == null) {
-                                    viewModel?.insert(newAlarm)
-                                } else {
-                                    viewModel?.update(newAlarm)
-                                }
-                                onBack()
+                                return@Button
                             }
+                            if (selectedChallenge == "Camera" && cameraObject.isEmpty()) {
+                                showStrictModeDialog = true
+                                return@Button
+                            }
+                            val newAlarm = AlarmEntity(
+                                id = alarm?.id ?: 0,
+                                timeHour = timePickerState.hour,
+                                timeMinute = timePickerState.minute,
+                                daysOfWeek = repeatDays,
+                                isActive = true,
+                                challengeType = selectedChallenge,
+                                soundName = soundName,
+                                soundUri = soundUri,
+                                vibrationEnabled = vibrationEnabled,
+                                qrCodeData = if (selectedChallenge == "QR Code") qrCodeData else "",
+                                qrCodeName = if (selectedChallenge == "QR Code") qrCodeName else "",
+                                cameraObject = if (selectedChallenge == "Camera") cameraObject else ""
+                            )
+                            if (alarm == null) {
+                                viewModel?.insert(newAlarm)
+                            } else {
+                                viewModel?.update(newAlarm)
+                            }
+                            onBack()
                         },
                         colors = ButtonDefaults.buttonColors(containerColor = primaryContainerDark, contentColor = onPrimaryContainerDark),
                         modifier = Modifier.padding(end = 8.dp)
@@ -238,8 +245,16 @@ fun SetupAlarmScreen(viewModel: AlarmViewModel? = null, alarm: AlarmEntity? = nu
                 TaskCard(
                     icon = Icons.Outlined.CameraAlt, 
                     title = "Camera", 
-                    subtitle = "Coming later", 
-                    modifier = Modifier.weight(1f),
+                    subtitle = if (selectedChallenge == "Camera") {
+                        if (cameraObject.isNotEmpty()) "Target: $cameraObject" else "Tap to setup Object"
+                    } else "Take a picture", 
+                    modifier = Modifier.weight(1f).clickable {
+                        if (selectedChallenge == "Camera") {
+                            showCameraObjectDialog = true
+                        } else {
+                            selectedChallenge = "Camera"
+                        }
+                    },
                     isSelected = selectedChallenge == "Camera"
                 )
                 Spacer(modifier = Modifier.width(16.dp))
@@ -417,6 +432,32 @@ fun SetupAlarmScreen(viewModel: AlarmViewModel? = null, alarm: AlarmEntity? = nu
                         Text("Cancel", color = onSurfaceVariantDark)
                     }
                 }
+            )
+        }
+        
+        if (showCameraObjectDialog) {
+            AlertDialog(
+                onDismissRequest = { showCameraObjectDialog = false },
+                title = { Text("Select Camera Target", color = onSurfaceDark) },
+                text = {
+                    Column {
+                        listOf("Sink", "Chair", "Mug", "Keyboard", "Shoe", "Toothbrush").forEach { target ->
+                            Row(modifier = Modifier.fillMaxWidth().clickable { 
+                                cameraObject = target
+                                showCameraObjectDialog = false
+                            }.padding(16.dp)) {
+                                Text(target, color = onSurfaceDark, fontSize = 16.sp)
+                            }
+                            HorizontalDivider(color = outlineDark.copy(alpha = 0.5f))
+                        }
+                    }
+                },
+                confirmButton = {
+                    TextButton(onClick = { showCameraObjectDialog = false }) {
+                        Text("Close", color = primaryDark)
+                    }
+                },
+                containerColor = surfaceContainerHighDark
             )
         }
     }

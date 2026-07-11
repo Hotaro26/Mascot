@@ -2,6 +2,7 @@ package com.hotaro.strictclock.ui
 
 import android.content.Intent
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.background
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
@@ -46,6 +47,40 @@ fun TimerScreen() {
         initialMinute = 15,
         is24Hour = true,
     )
+    
+    var showTimePickerDialog by remember { mutableStateOf(false) }
+    
+    if (showTimePickerDialog) {
+        AlertDialog(
+            onDismissRequest = { showTimePickerDialog = false },
+            title = { Text("Set Timer", color = onSurfaceDark) },
+            text = {
+                val colors = TimePickerDefaults.colors(
+                    clockDialColor = surfaceContainerHighDark,
+                    selectorColor = primaryDark,
+                    containerColor = backgroundDark,
+                    periodSelectorBorderColor = outlineDark,
+                    periodSelectorSelectedContainerColor = primaryContainerDark,
+                    periodSelectorSelectedContentColor = onPrimaryContainerDark,
+                    timeSelectorSelectedContainerColor = primaryContainerDark,
+                    timeSelectorSelectedContentColor = onPrimaryContainerDark,
+                    timeSelectorUnselectedContainerColor = surfaceContainerHighDark,
+                    timeSelectorUnselectedContentColor = onSurfaceDark
+                )
+                if (useKeyboardTimeInput) {
+                    TimeInput(state = timePickerState, colors = colors)
+                } else {
+                    TimePicker(state = timePickerState, colors = colors)
+                }
+            },
+            confirmButton = {
+                TextButton(onClick = { showTimePickerDialog = false }) {
+                    Text("OK", color = primaryDark)
+                }
+            },
+            containerColor = surfaceContainerHighDark
+        )
+    }
     
     var stopwatchRunning by remember { mutableStateOf(false) }
     var stopwatchTime by remember { mutableStateOf(0L) }
@@ -97,56 +132,63 @@ fun TimerScreen() {
         if (selectedTab == 0) {
             // Timer View
             if (!isRunning && timeRemaining == 0L) {
-                Spacer(modifier = Modifier.height(32.dp))
+                Spacer(modifier = Modifier.weight(1f))
                 
-                val colors = TimePickerDefaults.colors(
-                    clockDialColor = surfaceContainerHighDark,
-                    selectorColor = primaryDark,
-                    containerColor = backgroundDark,
-                    periodSelectorBorderColor = outlineDark,
-                    periodSelectorSelectedContainerColor = primaryContainerDark,
-                    periodSelectorSelectedContentColor = onPrimaryContainerDark,
-                    timeSelectorSelectedContainerColor = primaryContainerDark,
-                    timeSelectorSelectedContentColor = onPrimaryContainerDark,
-                    timeSelectorUnselectedContainerColor = surfaceContainerHighDark,
-                    timeSelectorUnselectedContentColor = onSurfaceDark
-                )
-
-                if (useKeyboardTimeInput) {
-                    TimeInput(state = timePickerState, colors = colors)
-                } else {
-                    TimePicker(state = timePickerState, colors = colors)
-                }
+                val h = timePickerState.hour
+                val m = timePickerState.minute
+                val timeStr = if (h > 0) String.format("%02d:%02d:00", h, m) else String.format("%02d:00", m)
                 
+                Text(timeStr, fontSize = 72.sp, fontWeight = FontWeight.Normal, color = onSurfaceDark)
                 Spacer(modifier = Modifier.height(16.dp))
                 Text("Set timer (HH:MM)", color = onSurfaceVariantDark, fontSize = 20.sp)
                 
                 Spacer(modifier = Modifier.weight(1f))
                 
-                // Big FAB for start
+                // Pill FAB for start and setup
                 Surface(
-                    shape = CircleShape,
+                    shape = androidx.compose.foundation.shape.RoundedCornerShape(50),
                     color = primaryDark,
                     modifier = Modifier
-                        .size(96.dp)
+                        .height(88.dp)
+                        .width(200.dp)
                         .padding(bottom = 16.dp)
                 ) {
-                    IconButton(onClick = {
-                        val h = timePickerState.hour.toLong()
-                        val m = timePickerState.minute.toLong()
-                        val totalMs = (h * 60 * 60 + m * 60) * 1000
-                        if (totalMs > 0) {
-                            val intent = Intent(context, TimerService::class.java)
-                            intent.action = TimerService.ACTION_START
-                            intent.putExtra(TimerService.EXTRA_DURATION_MS, totalMs)
-                            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
-                                context.startForegroundService(intent)
-                            } else {
-                                context.startService(intent)
-                            }
+                    Row(
+                        modifier = Modifier.fillMaxSize(),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        IconButton(
+                            onClick = {
+                                val totalMs = (h * 60 * 60 + m * 60) * 1000L
+                                if (totalMs > 0) {
+                                    val intent = Intent(context, TimerService::class.java)
+                                    intent.action = TimerService.ACTION_START
+                                    intent.putExtra(TimerService.EXTRA_DURATION_MS, totalMs)
+                                    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+                                        context.startForegroundService(intent)
+                                    } else {
+                                        context.startService(intent)
+                                    }
+                                }
+                            },
+                            modifier = Modifier.weight(1f).fillMaxHeight()
+                        ) {
+                            Icon(Icons.Default.PlayArrow, contentDescription = "Start", tint = onPrimaryDark, modifier = Modifier.size(40.dp))
                         }
-                    }) {
-                        Icon(Icons.Default.PlayArrow, contentDescription = "Start", tint = onPrimaryDark, modifier = Modifier.size(48.dp))
+                        
+                        Box(
+                            modifier = Modifier
+                                .fillMaxHeight(0.5f)
+                                .width(2.dp)
+                                .background(onPrimaryDark.copy(alpha = 0.5f))
+                        )
+                        
+                        IconButton(
+                            onClick = { showTimePickerDialog = true },
+                            modifier = Modifier.weight(1f).fillMaxHeight()
+                        ) {
+                            Icon(Icons.Default.Alarm, contentDescription = "Set Time", tint = onPrimaryDark, modifier = Modifier.size(32.dp))
+                        }
                     }
                 }
             } else {

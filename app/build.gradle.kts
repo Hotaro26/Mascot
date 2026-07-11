@@ -73,6 +73,9 @@ dependencies {
     // ML Kit Barcode Scanning
     implementation("com.google.mlkit:barcode-scanning:17.2.0")
     
+    // ML Kit Image Labeling (Bundled)
+    implementation("com.google.mlkit:image-labeling:17.0.9")
+    
     // DataStore Preferences
     implementation("androidx.datastore:datastore-preferences:1.0.0")
 }

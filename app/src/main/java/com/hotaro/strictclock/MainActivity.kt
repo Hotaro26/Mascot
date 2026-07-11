@@ -30,6 +30,7 @@ class MainActivity : ComponentActivity() {
         val challengeType = intent.getStringExtra("CHALLENGE_TYPE") ?: "None"
         val qrCodeData = intent.getStringExtra("QR_CODE_DATA") ?: ""
         val qrCodeName = intent.getStringExtra("QR_CODE_NAME") ?: ""
+        val cameraObject = intent.getStringExtra("CAMERA_OBJECT") ?: ""
 
         if (isWakeUp) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) {
@@ -52,7 +53,7 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    StrictClockApp(isWakeUp = isWakeUp, challengeType = challengeType, qrCodeData = qrCodeData, qrCodeName = qrCodeName)
+                    StrictClockApp(isWakeUp = isWakeUp, challengeType = challengeType, qrCodeData = qrCodeData, qrCodeName = qrCodeName, cameraObject = cameraObject)
                 }
             }
         }

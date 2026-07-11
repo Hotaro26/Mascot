@@ -46,6 +46,7 @@ class AlarmService : Service() {
         val vibrationEnabled = intent?.getBooleanExtra("VIBRATION_ENABLED", true) ?: true
         val qrCodeData = intent?.getStringExtra("QR_CODE_DATA") ?: ""
         val qrCodeName = intent?.getStringExtra("QR_CODE_NAME") ?: ""
+        val cameraObject = intent?.getStringExtra("CAMERA_OBJECT") ?: ""
 
         // Full screen intent to launch WakeUp UI
         val fullScreenIntent = Intent(this, MainActivity::class.java).apply {
@@ -57,6 +58,7 @@ class AlarmService : Service() {
             putExtra("VIBRATION_ENABLED", vibrationEnabled)
             putExtra("QR_CODE_DATA", qrCodeData)
             putExtra("QR_CODE_NAME", qrCodeName)
+            putExtra("CAMERA_OBJECT", cameraObject)
         }
 
         val fullScreenPendingIntent = PendingIntent.getActivity(

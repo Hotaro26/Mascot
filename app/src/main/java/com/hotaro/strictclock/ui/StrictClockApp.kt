@@ -27,7 +27,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
 
 @Composable
-fun StrictClockApp(isWakeUp: Boolean = false, challengeType: String = "None", qrCodeData: String = "", qrCodeName: String = "") {
+fun StrictClockApp(isWakeUp: Boolean = false, challengeType: String = "None", qrCodeData: String = "", qrCodeName: String = "", cameraObject: String = "") {
     val context = LocalContext.current
     val hasAllPermissions = remember {
         val hasNotif = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) ContextCompat.checkSelfPermission(context, android.Manifest.permission.POST_NOTIFICATIONS) == android.content.pm.PackageManager.PERMISSION_GRANTED else true
@@ -180,6 +180,7 @@ fun StrictClockApp(isWakeUp: Boolean = false, challengeType: String = "None", qr
                             challengeType = challengeType, 
                             qrCodeData = qrCodeData, 
                             qrCodeName = qrCodeName,
+                            cameraObject = cameraObject,
                             onStopAlarm = {
                                 val serviceIntent = android.content.Intent(context, com.hotaro.strictclock.service.AlarmService::class.java)
                                 context.stopService(serviceIntent)
@@ -212,6 +213,7 @@ fun StrictClockApp(isWakeUp: Boolean = false, challengeType: String = "None", qr
                                     putExtra("VIBRATION_ENABLED", vibrationEnabled)
                                     putExtra("QR_CODE_DATA", qrCodeData)
                                     putExtra("QR_CODE_NAME", qrCodeName)
+                                    putExtra("CAMERA_OBJECT", cameraObject)
                                 }
                                 
                                 val pendingIntent = android.app.PendingIntent.getBroadcast(
@@ -235,13 +237,15 @@ fun StrictClockApp(isWakeUp: Boolean = false, challengeType: String = "None", qr
                         onNavigateToThemeMode = { currentScreen = "ThemeMode" },
                         onNavigateToQrManagement = { currentScreen = "QrManagement" },
                         onNavigateToZenMode = { currentScreen = "ZenMode" },
-                        onNavigateToCustomisation = { currentScreen = "Customisation" }
+                        onNavigateToCustomisation = { currentScreen = "Customisation" },
+                        onNavigateToAiReadiness = { currentScreen = "AiReadiness" }
                     )
                     "ColorScheme" -> ColorSchemeScreen(onBack = { currentScreen = "Settings" })
                     "ThemeMode" -> ThemeModeScreen(onBack = { currentScreen = "Settings" })
                     "QrManagement" -> QrManagementScreen(onBack = { currentScreen = "Settings" })
                     "ZenMode" -> ZenModeScreen(onBack = { currentScreen = "Settings" })
                     "Customisation" -> CustomisationScreen(onBack = { currentScreen = "Settings" })
+                    "AiReadiness" -> AiReadinessScreen(onBack = { currentScreen = "Settings" })
                     else -> ClockDashboard(onNavigateToSetup = { currentScreen = "Setup" })
                 }
             }
