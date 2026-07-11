@@ -25,7 +25,8 @@ fun SettingsScreen(
     onNavigateToColorScheme: () -> Unit = {},
     onNavigateToThemeMode: () -> Unit = {},
     onNavigateToQrManagement: () -> Unit = {},
-    onNavigateToZenMode: () -> Unit = {}
+    onNavigateToZenMode: () -> Unit = {},
+    onNavigateToCustomisation: () -> Unit = {}
 ) {
     Scaffold(
         topBar = {
@@ -104,6 +105,14 @@ fun SettingsScreen(
             
             // Appearance
             Text("Appearance", color = onSurfaceDark, fontSize = 16.sp, fontWeight = FontWeight.Medium)
+            Spacer(modifier = Modifier.height(16.dp))
+            SettingsRow(
+                icon = Icons.Outlined.DashboardCustomize,
+                title = "Customisation",
+                subtitle = "Input preferences and styles",
+                showArrow = true,
+                onClick = onNavigateToCustomisation
+            )
             Spacer(modifier = Modifier.height(16.dp))
             val activeScheme by ThemeManager.activeScheme.collectAsState()
             SettingsRow(

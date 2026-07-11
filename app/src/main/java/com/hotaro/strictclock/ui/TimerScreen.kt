@@ -29,6 +29,7 @@ import com.hotaro.strictclock.service.TimerService
 import com.hotaro.strictclock.ui.theme.*
 import kotlinx.coroutines.delay
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TimerScreen() {
     var selectedTab by remember { mutableStateOf(0) }
@@ -37,8 +38,14 @@ fun TimerScreen() {
     val timeRemaining by TimerManager.timeRemaining.collectAsState()
     val isRunning by TimerManager.isRunning.collectAsState()
 
-    var inputMinutes by remember { mutableStateOf("15") }
-    var inputSeconds by remember { mutableStateOf("00") }
+    val prefs = context.getSharedPreferences("strict_clock_prefs", android.content.Context.MODE_PRIVATE)
+    val useKeyboardTimeInput = prefs.getBoolean("use_keyboard_time_input", false)
+    
+    val timePickerState = rememberTimePickerState(
+        initialHour = 0,
+        initialMinute = 15,
+        is24Hour = true,
+    )
     
     var stopwatchRunning by remember { mutableStateOf(false) }
     var stopwatchTime by remember { mutableStateOf(0L) }
@@ -90,42 +97,29 @@ fun TimerScreen() {
         if (selectedTab == 0) {
             // Timer View
             if (!isRunning && timeRemaining == 0L) {
-                Spacer(modifier = Modifier.height(64.dp))
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    OutlinedTextField(
-                        value = inputMinutes,
-                        onValueChange = { if (it.length <= 2) inputMinutes = it },
-                        modifier = Modifier.width(100.dp),
-                        textStyle = LocalTextStyle.current.copy(fontSize = 48.sp, textAlign = TextAlign.Center),
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                        singleLine = true,
-                        shape = androidx.compose.foundation.shape.RoundedCornerShape(16.dp),
-                        colors = OutlinedTextFieldDefaults.colors(
-                            focusedBorderColor = primaryDark,
-                            unfocusedBorderColor = outlineDark,
-                            focusedTextColor = primaryDark,
-                            unfocusedTextColor = onSurfaceDark
-                        )
-                    )
-                    Text(" : ", fontSize = 48.sp, color = primaryDark)
-                    OutlinedTextField(
-                        value = inputSeconds,
-                        onValueChange = { if (it.length <= 2) inputSeconds = it },
-                        modifier = Modifier.width(100.dp),
-                        textStyle = LocalTextStyle.current.copy(fontSize = 48.sp, textAlign = TextAlign.Center),
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                        singleLine = true,
-                        shape = androidx.compose.foundation.shape.RoundedCornerShape(16.dp),
-                        colors = OutlinedTextFieldDefaults.colors(
-                            focusedBorderColor = primaryDark,
-                            unfocusedBorderColor = outlineDark,
-                            focusedTextColor = primaryDark,
-                            unfocusedTextColor = onSurfaceDark
-                        )
-                    )
+                Spacer(modifier = Modifier.height(32.dp))
+                
+                val colors = TimePickerDefaults.colors(
+                    clockDialColor = surfaceContainerHighDark,
+                    selectorColor = primaryDark,
+                    containerColor = backgroundDark,
+                    periodSelectorBorderColor = outlineDark,
+                    periodSelectorSelectedContainerColor = primaryContainerDark,
+                    periodSelectorSelectedContentColor = onPrimaryContainerDark,
+                    timeSelectorSelectedContainerColor = primaryContainerDark,
+                    timeSelectorSelectedContentColor = onPrimaryContainerDark,
+                    timeSelectorUnselectedContainerColor = surfaceContainerHighDark,
+                    timeSelectorUnselectedContentColor = onSurfaceDark
+                )
+
+                if (useKeyboardTimeInput) {
+                    TimeInput(state = timePickerState, colors = colors)
+                } else {
+                    TimePicker(state = timePickerState, colors = colors)
                 }
+                
                 Spacer(modifier = Modifier.height(16.dp))
-                Text("Set timer (MM:SS)", color = onSurfaceVariantDark, fontSize = 20.sp)
+                Text("Set timer (HH:MM)", color = onSurfaceVariantDark, fontSize = 20.sp)
                 
                 Spacer(modifier = Modifier.weight(1f))
                 
@@ -138,9 +132,9 @@ fun TimerScreen() {
                         .padding(bottom = 16.dp)
                 ) {
                     IconButton(onClick = {
-                        val m = inputMinutes.toLongOrNull() ?: 0L
-                        val s = inputSeconds.toLongOrNull() ?: 0L
-                        val totalMs = (m * 60 + s) * 1000
+                        val h = timePickerState.hour.toLong()
+                        val m = timePickerState.minute.toLong()
+                        val totalMs = (h * 60 * 60 + m * 60) * 1000
                         if (totalMs > 0) {
                             val intent = Intent(context, TimerService::class.java)
                             intent.action = TimerService.ACTION_START

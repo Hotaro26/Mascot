@@ -40,8 +40,9 @@ import com.hotaro.strictclock.ui.challenges.QRScannerView
 @Composable
 fun SetupAlarmScreen(viewModel: AlarmViewModel? = null, alarm: AlarmEntity? = null, onBack: () -> Unit) {
     val currentTime = Calendar.getInstance()
+    
     val timePickerState = rememberTimePickerState(
-        initialHour = alarm?.timeHour ?: currentTime.get(Calendar.HOUR_OF_DAY),
+        initialHour = alarm?.timeHour ?: java.util.Calendar.getInstance().get(java.util.Calendar.HOUR_OF_DAY),
         initialMinute = alarm?.timeMinute ?: currentTime.get(Calendar.MINUTE),
         is24Hour = false,
     )
@@ -77,6 +78,7 @@ fun SetupAlarmScreen(viewModel: AlarmViewModel? = null, alarm: AlarmEntity? = nu
     }
     
     val prefs = context.getSharedPreferences("strict_clock_prefs", Context.MODE_PRIVATE)
+    val useKeyboardTimeInput = prefs.getBoolean("use_keyboard_time_input", false)
 
     Scaffold(
         topBar = {
@@ -157,21 +159,24 @@ fun SetupAlarmScreen(viewModel: AlarmViewModel? = null, alarm: AlarmEntity? = nu
         ) {
             Spacer(modifier = Modifier.height(24.dp))
             
-            TimeInput(
-                state = timePickerState,
-                colors = TimePickerDefaults.colors(
-                    clockDialColor = surfaceContainerHighDark,
-                    selectorColor = primaryDark,
-                    containerColor = backgroundDark,
-                    periodSelectorBorderColor = outlineDark,
-                    periodSelectorSelectedContainerColor = primaryContainerDark,
-                    periodSelectorSelectedContentColor = onPrimaryContainerDark,
-                    timeSelectorSelectedContainerColor = primaryContainerDark,
-                    timeSelectorSelectedContentColor = onPrimaryContainerDark,
-                    timeSelectorUnselectedContainerColor = surfaceContainerHighDark,
-                    timeSelectorUnselectedContentColor = onSurfaceDark
-                )
+            val colors = TimePickerDefaults.colors(
+                clockDialColor = surfaceContainerHighDark,
+                selectorColor = primaryDark,
+                containerColor = backgroundDark,
+                periodSelectorBorderColor = outlineDark,
+                periodSelectorSelectedContainerColor = primaryContainerDark,
+                periodSelectorSelectedContentColor = onPrimaryContainerDark,
+                timeSelectorSelectedContainerColor = primaryContainerDark,
+                timeSelectorSelectedContentColor = onPrimaryContainerDark,
+                timeSelectorUnselectedContainerColor = surfaceContainerHighDark,
+                timeSelectorUnselectedContentColor = onSurfaceDark
             )
+
+            if (useKeyboardTimeInput) {
+                TimeInput(state = timePickerState, colors = colors)
+            } else {
+                TimePicker(state = timePickerState, colors = colors)
+            }
             
             Spacer(modifier = Modifier.height(32.dp))
             
