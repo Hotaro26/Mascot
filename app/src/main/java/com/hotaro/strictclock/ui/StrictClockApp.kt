@@ -183,6 +183,21 @@ fun StrictClockApp(isWakeUp: Boolean = false, challengeType: String = "None", qr
                             onStopAlarm = {
                                 val serviceIntent = android.content.Intent(context, com.hotaro.strictclock.service.AlarmService::class.java)
                                 context.stopService(serviceIntent)
+                                
+                                val prefs = context.getSharedPreferences("strict_clock_prefs", android.content.Context.MODE_PRIVATE)
+                                val currentStreak = prefs.getInt("wake_up_streak", 0)
+                                val lastDate = prefs.getString("last_streak_date", "")
+                                val today = java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.getDefault()).format(java.util.Date())
+                                
+                                if (lastDate != today) {
+                                    val calendar = java.util.Calendar.getInstance()
+                                    calendar.add(java.util.Calendar.DAY_OF_YEAR, -1)
+                                    val yesterday = java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.getDefault()).format(calendar.time)
+                                    
+                                    val newStreak = if (lastDate == yesterday) currentStreak + 1 else 1
+                                    prefs.edit().putInt("wake_up_streak", newStreak).putString("last_streak_date", today).apply()
+                                }
+                                
                                 context.finish()
                             },
                             onSnoozeAlarm = {

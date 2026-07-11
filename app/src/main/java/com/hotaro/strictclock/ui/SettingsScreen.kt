@@ -48,11 +48,9 @@ fun SettingsScreen(
         ) {
             Spacer(modifier = Modifier.height(16.dp))
             
-            Text("Settings", fontSize = 32.sp, fontWeight = FontWeight.Normal, color = onSurfaceDark)
-            Spacer(modifier = Modifier.height(8.dp))
-            Text("Manage your alarm experience and device sync.", color = onSurfaceVariantDark, fontSize = 16.sp)
-            
-            Spacer(modifier = Modifier.height(24.dp))
+            val context = androidx.compose.ui.platform.LocalContext.current
+            val prefs = context.getSharedPreferences("strict_clock_prefs", android.content.Context.MODE_PRIVATE)
+            val streak = prefs.getInt("wake_up_streak", 0)
             
             // Top Cards
             Row(modifier = Modifier.fillMaxWidth()) {
@@ -65,7 +63,7 @@ fun SettingsScreen(
                         Icon(Icons.Outlined.Bolt, contentDescription = null, tint = onSurfaceDark, modifier = Modifier.size(28.dp))
                         Spacer(modifier = Modifier.weight(1f))
                         Text("Wake-up streak", color = onSurfaceVariantDark, fontSize = 14.sp)
-                        Text("12 Days", color = onSurfaceDark, fontSize = 18.sp, fontWeight = FontWeight.Medium)
+                        Text("$streak Days", color = onSurfaceDark, fontSize = 18.sp, fontWeight = FontWeight.Medium)
                     }
                 }
                 Spacer(modifier = Modifier.width(16.dp))
