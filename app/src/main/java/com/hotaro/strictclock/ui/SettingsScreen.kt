@@ -28,6 +28,7 @@ fun SettingsScreen(
     onNavigateToZenMode: () -> Unit = {},
     onNavigateToCustomisation: () -> Unit = {},
     onNavigateToMathSettings: () -> Unit = {},
+    onNavigateToPuzzles: () -> Unit = {},
     onNavigateToAiReadiness: () -> Unit = {},
     onNavigateToAbout: () -> Unit = {},
     onNavigateToAppIcons: () -> Unit = {}
@@ -124,7 +125,7 @@ fun SettingsScreen(
             Spacer(modifier = Modifier.height(16.dp))
             SettingsRow(icon = Icons.Outlined.Calculate, title = "Math Settings", subtitle = "Customise math challenges", showArrow = true, bottomStart = 4.dp, bottomEnd = 4.dp, onClick = onNavigateToMathSettings)
             Spacer(modifier = Modifier.height(2.dp))
-            SettingsRow(icon = Icons.Outlined.FitnessCenter, title = "Task Difficulty", subtitle = "Intermediate level", showArrow = true, topStart = 4.dp, topEnd = 4.dp, bottomStart = 4.dp, bottomEnd = 4.dp)
+            SettingsRow(icon = Icons.Outlined.Extension, title = "Puzzles", subtitle = "Configure puzzle challenges", showArrow = true, topStart = 4.dp, topEnd = 4.dp, bottomStart = 4.dp, bottomEnd = 4.dp, onClick = onNavigateToPuzzles)
             Spacer(modifier = Modifier.height(2.dp))
             SettingsRow(icon = Icons.Outlined.QrCodeScanner, title = "QR Management", subtitle = "Manage saved codes", showArrow = true, topStart = 4.dp, topEnd = 4.dp, onClick = onNavigateToQrManagement)
             

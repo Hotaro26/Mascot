@@ -87,6 +87,8 @@ fun SetupAlarmScreen(viewModel: AlarmViewModel? = null, alarm: AlarmEntity? = nu
     }
     
     val prefs = context.getSharedPreferences("strict_clock_prefs", Context.MODE_PRIVATE)
+    
+    val puzzleType = prefs.getString("puzzle_type", "Memory Match") ?: "Memory Match"
     val useKeyboardTimeInput = prefs.getBoolean("use_keyboard_time_input", false)
 
     Scaffold(
@@ -107,7 +109,7 @@ fun SetupAlarmScreen(viewModel: AlarmViewModel? = null, alarm: AlarmEntity? = nu
                 actions = {
                     Button(
                         onClick = {
-                            if (selectedChallenge == "None" || selectedChallenge == "Puzzle") {
+                            if (selectedChallenge == "None") {
                                 showStrictModeDialog = true
                                 return@Button
                             }
@@ -344,8 +346,8 @@ fun SetupAlarmScreen(viewModel: AlarmViewModel? = null, alarm: AlarmEntity? = nu
                 TaskCard(
                     icon = Icons.Outlined.Extension, 
                     title = "Puzzle", 
-                    subtitle = "Coming later", 
-                    modifier = Modifier.weight(1f),
+                    subtitle = puzzleType, 
+                    modifier = Modifier.weight(1f).clickable { selectedChallenge = "Puzzle" },
                     isSelected = selectedChallenge == "Puzzle"
                 )
             }

@@ -87,6 +87,7 @@ fun WakeUpScreen(
                 "QR Code" -> QRChallengeView(qrCodeData, qrCodeName, zenModeEnabled, onSnoozeAlarm, onStopAlarm)
                 "QR" -> QRChallengeView(qrCodeData, qrCodeName, zenModeEnabled, onSnoozeAlarm, onStopAlarm)
                 "Camera" -> CameraChallengeViewWrapper(cameraObject, zenModeEnabled, onSnoozeAlarm, onStopAlarm)
+                "Puzzle" -> PuzzleChallengeView(zenModeEnabled, onSnoozeAlarm, onStopAlarm)
                 else -> RegularWakeUpView(zenModeEnabled, onSnoozeAlarm, onStopAlarm)
             }
         }
