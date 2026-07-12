@@ -199,6 +199,7 @@ fun StrictClockApp(isWakeUp: Boolean = false, challengeType: String = "None", qr
                         onNavigateToCustomisation = { currentScreen = "Customisation" },
                         onNavigateToMathSettings = { currentScreen = "MathSettings" },
                         onNavigateToPuzzles = { currentScreen = "PuzzleSettings" },
+                        onNavigateToFlashbang = { currentScreen = "FlashbangSettings" },
                         onNavigateToAiReadiness = { currentScreen = "AiReadiness" },
                         onNavigateToAbout = { currentScreen = "About" },
                         onNavigateToAppIcons = { currentScreen = "AppIcons" }
@@ -206,6 +207,7 @@ fun StrictClockApp(isWakeUp: Boolean = false, challengeType: String = "None", qr
                     "AppIcons" -> AppIconsScreen(onBack = { currentScreen = "Settings" })
                     "MathSettings" -> MathSettingsScreen(onBack = { currentScreen = "Settings" })
                     "PuzzleSettings" -> PuzzleSettingsScreen(onBack = { currentScreen = "Settings" })
+                    "FlashbangSettings" -> FlashbangSettingsScreen(onBack = { currentScreen = "Settings" })
                     "ColorScheme" -> ColorSchemeScreen(onBack = { currentScreen = "Settings" })
                     "ThemeMode" -> ThemeModeScreen(onBack = { currentScreen = "Settings" })
                     "QrManagement" -> QrManagementScreen(onBack = { currentScreen = "Settings" })

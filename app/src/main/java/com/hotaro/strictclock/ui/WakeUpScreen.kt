@@ -44,11 +44,51 @@ fun WakeUpScreen(
     val context = LocalContext.current
     val prefs = context.getSharedPreferences("strict_clock_prefs", Context.MODE_PRIVATE)
     val zenModeEnabled = prefs.getBoolean("zen_mode", true)
+    
+    // Flashbang preferences
+    val flashbangEnabled = prefs.getBoolean("flashbang_enabled", false)
+    val fullBrightness = prefs.getBoolean("flashbang_full_brightness", true)
+    val isBlinking = prefs.getBoolean("flashbang_blinking", true)
+    val blinkSpeed = prefs.getFloat("flashbang_blink_speed", 500f)
+    val defaultColors = listOf("#FFFFFF", "#FF0000", "#FFFF00").joinToString(",")
+    val flashbangColorsStr = prefs.getString("flashbang_colors", defaultColors) ?: defaultColors
+    
     val currentTime = Calendar.getInstance()
     val hour = currentTime.get(Calendar.HOUR_OF_DAY)
     val minute = currentTime.get(Calendar.MINUTE)
     val timeStr = String.format("%02d:%02d", hour, minute)
     val dayStr = android.text.format.DateFormat.format("EEEE, MMM d", currentTime.timeInMillis).toString()
+
+    val defaultBgColor = backgroundDark
+    var currentFlashColor by remember { mutableStateOf(defaultBgColor) }
+
+    if (flashbangEnabled) {
+        val activity = context as? android.app.Activity
+        if (fullBrightness) {
+            LaunchedEffect(Unit) {
+                val window = activity?.window
+                val layoutParams = window?.attributes
+                layoutParams?.screenBrightness = 1.0f
+                window?.attributes = layoutParams
+            }
+        }
+
+        val colorsList = flashbangColorsStr.split(",").filter { it.isNotEmpty() }.map { Color(android.graphics.Color.parseColor(it)) }
+        if (colorsList.isNotEmpty()) {
+            LaunchedEffect(isBlinking, blinkSpeed) {
+                var colorIndex = 0
+                while (true) {
+                    currentFlashColor = colorsList[colorIndex % colorsList.size]
+                    colorIndex++
+                    kotlinx.coroutines.delay(blinkSpeed.toLong())
+                    if (isBlinking) {
+                        currentFlashColor = defaultBgColor
+                        kotlinx.coroutines.delay(blinkSpeed.toLong())
+                    }
+                }
+            }
+        }
+    }
 
     Scaffold(
         topBar = {
@@ -65,9 +105,14 @@ fun WakeUpScreen(
                 IconButton(onClick = { }) { Icon(Icons.Default.MoreVert, contentDescription = "Menu", tint = onSurfaceDark) }
             }
         },
-        containerColor = backgroundDark
+        containerColor = currentFlashColor
     ) { innerPadding ->
-        Column(
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(if (flashbangEnabled) Color.Black.copy(alpha = 0.4f) else Color.Transparent)
+        ) {
+            Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
@@ -90,6 +135,7 @@ fun WakeUpScreen(
                 "Puzzle" -> PuzzleChallengeView(zenModeEnabled, onSnoozeAlarm, onStopAlarm)
                 else -> RegularWakeUpView(zenModeEnabled, onSnoozeAlarm, onStopAlarm)
             }
+        }
         }
     }
 }

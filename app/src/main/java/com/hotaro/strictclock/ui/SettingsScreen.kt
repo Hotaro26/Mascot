@@ -29,6 +29,7 @@ fun SettingsScreen(
     onNavigateToCustomisation: () -> Unit = {},
     onNavigateToMathSettings: () -> Unit = {},
     onNavigateToPuzzles: () -> Unit = {},
+    onNavigateToFlashbang: () -> Unit = {},
     onNavigateToAiReadiness: () -> Unit = {},
     onNavigateToAbout: () -> Unit = {},
     onNavigateToAppIcons: () -> Unit = {}
@@ -98,25 +99,11 @@ fun SettingsScreen(
             // Alarm Behavior
             Text("Alarm Behavior", color = onSurfaceDark, fontSize = 16.sp, fontWeight = FontWeight.Medium, modifier = Modifier.padding(start = 8.dp))
             Spacer(modifier = Modifier.height(16.dp))
-            SettingsRow(icon = Icons.Outlined.Snooze, title = "Zen Mode", subtitle = "Manage snoozing", showArrow = true, bottomStart = 4.dp, bottomEnd = 4.dp, onClick = onNavigateToZenMode)
+            SettingsRow(icon = Icons.Outlined.MusicNote, title = "Alarm Sound", subtitle = "Default ringtone", showArrow = true, bottomStart = 4.dp, bottomEnd = 4.dp)
             Spacer(modifier = Modifier.height(2.dp))
-            val isAmoled by ThemeManager.isAmoled.collectAsState()
-            val themeModeValue = ThemeManager.themeMode.collectAsState().value
-            val isSystemDark = androidx.compose.foundation.isSystemInDarkTheme()
-            val isDarkTheme = themeModeValue == "Dark" || (themeModeValue == "System" && isSystemDark)
-            
-            SettingsRowSwitch(
-                icon = Icons.Outlined.DarkMode, 
-                title = "Amoled Mode", 
-                subtitle = "True black background", 
-                checked = isAmoled,
-                enabled = isDarkTheme,
-                onDisabledClick = {
-                    android.widget.Toast.makeText(context, "AMOLED mode cannot be used in Light mode", android.widget.Toast.LENGTH_SHORT).show()
-                },
-                topStart = 4.dp, topEnd = 4.dp, 
-                onCheckedChange = { ThemeManager.setAmoled(it) }
-            )
+            SettingsRow(icon = Icons.Outlined.Snooze, title = "Zen Mode", subtitle = "Manage snoozing", showArrow = true, topStart = 4.dp, topEnd = 4.dp, bottomStart = 4.dp, bottomEnd = 4.dp, onClick = onNavigateToZenMode)
+            Spacer(modifier = Modifier.height(2.dp))
+            SettingsRow(icon = Icons.Outlined.FlashlightOn, title = "Flashbang", subtitle = "Screen flashing options", showArrow = true, topStart = 4.dp, topEnd = 4.dp, onClick = onNavigateToFlashbang)
             
             Spacer(modifier = Modifier.height(32.dp))
             
@@ -169,8 +156,26 @@ fun SettingsScreen(
                 title = "Theme Mode", 
                 subtitle = themeMode, 
                 showArrow = true,
-                topStart = 4.dp, topEnd = 4.dp,
+                topStart = 4.dp, topEnd = 4.dp, bottomStart = 4.dp, bottomEnd = 4.dp,
                 onClick = onNavigateToThemeMode
+            )
+            Spacer(modifier = Modifier.height(2.dp))
+
+            val isAmoled by ThemeManager.isAmoled.collectAsState()
+            val isSystemDark = androidx.compose.foundation.isSystemInDarkTheme()
+            val isDarkTheme = themeMode == "Dark" || (themeMode == "System" && isSystemDark)
+            
+            SettingsRowSwitch(
+                icon = Icons.Outlined.DarkMode, 
+                title = "Amoled Mode", 
+                subtitle = "True black background", 
+                checked = isAmoled,
+                enabled = isDarkTheme,
+                onDisabledClick = {
+                    android.widget.Toast.makeText(context, "AMOLED mode cannot be used in Light mode", android.widget.Toast.LENGTH_SHORT).show()
+                },
+                topStart = 4.dp, topEnd = 4.dp, 
+                onCheckedChange = { ThemeManager.setAmoled(it) }
             )
             Spacer(modifier = Modifier.height(32.dp))
             
