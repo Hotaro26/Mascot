@@ -59,6 +59,26 @@ fun SettingsScreen(
             val prefs = context.getSharedPreferences("strict_clock_prefs", android.content.Context.MODE_PRIVATE)
             val streak = prefs.getInt("wake_up_streak", 0)
             
+            var defaultRingtoneName by androidx.compose.runtime.remember { androidx.compose.runtime.mutableStateOf("Default ringtone") }
+            val ringtoneLauncher = androidx.activity.compose.rememberLauncherForActivityResult(androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult()) { result ->
+                if (result.resultCode == android.app.Activity.RESULT_OK) {
+                    val uri: android.net.Uri? = result.data?.getParcelableExtra(android.media.RingtoneManager.EXTRA_RINGTONE_PICKED_URI)
+                    val uriStr = uri?.toString() ?: ""
+                    prefs.edit().putString("default_alarm_sound", uriStr).apply()
+                    val ringtone = android.media.RingtoneManager.getRingtone(context, uri)
+                    defaultRingtoneName = ringtone?.getTitle(context) ?: "Selected Sound"
+                }
+            }
+            
+            androidx.compose.runtime.LaunchedEffect(Unit) {
+                val savedUri = prefs.getString("default_alarm_sound", "")
+                if (!savedUri.isNullOrEmpty()) {
+                    val uri = android.net.Uri.parse(savedUri)
+                    val ringtone = android.media.RingtoneManager.getRingtone(context, uri)
+                    defaultRingtoneName = ringtone?.getTitle(context) ?: "Selected Sound"
+                }
+            }
+            
             androidx.compose.runtime.LaunchedEffect(Unit) {
                 ThemeManager.checkAiStatus(context)
             }
@@ -99,7 +119,22 @@ fun SettingsScreen(
             // Alarm Behavior
             Text("Alarm Behavior", color = onSurfaceDark, fontSize = 16.sp, fontWeight = FontWeight.Medium, modifier = Modifier.padding(start = 8.dp))
             Spacer(modifier = Modifier.height(16.dp))
-            SettingsRow(icon = Icons.Outlined.MusicNote, title = "Alarm Sound", subtitle = "Default ringtone", showArrow = true, bottomStart = 4.dp, bottomEnd = 4.dp)
+            SettingsRow(
+                icon = Icons.Outlined.MusicNote, 
+                title = "Alarm Sound", 
+                subtitle = defaultRingtoneName, 
+                showArrow = true, 
+                bottomStart = 4.dp, 
+                bottomEnd = 4.dp,
+                onClick = {
+                    val intent = android.content.Intent(android.media.RingtoneManager.ACTION_RINGTONE_PICKER).apply {
+                        putExtra(android.media.RingtoneManager.EXTRA_RINGTONE_TYPE, android.media.RingtoneManager.TYPE_ALARM)
+                        putExtra(android.media.RingtoneManager.EXTRA_RINGTONE_SHOW_DEFAULT, true)
+                        putExtra(android.media.RingtoneManager.EXTRA_RINGTONE_SHOW_SILENT, true)
+                    }
+                    ringtoneLauncher.launch(intent)
+                }
+            )
             Spacer(modifier = Modifier.height(2.dp))
             SettingsRow(icon = Icons.Outlined.Snooze, title = "Zen Mode", subtitle = "Manage snoozing", showArrow = true, topStart = 4.dp, topEnd = 4.dp, bottomStart = 4.dp, bottomEnd = 4.dp, onClick = onNavigateToZenMode)
             Spacer(modifier = Modifier.height(2.dp))

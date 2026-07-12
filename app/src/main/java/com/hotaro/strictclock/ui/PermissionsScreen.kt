@@ -65,7 +65,7 @@ fun PermissionsScreen(onComplete: () -> Unit) {
 
     Column(modifier = Modifier.fillMaxSize().padding(24.dp), horizontalAlignment = Alignment.CenterHorizontally) {
         Spacer(modifier = Modifier.height(64.dp))
-        Text("Welcome to Matco", fontSize = 32.sp, fontWeight = FontWeight.Bold, color = onSurfaceDark)
+        Text("Welcome to Mascot!", fontSize = 32.sp, fontWeight = FontWeight.Bold, color = onSurfaceDark)
         Spacer(modifier = Modifier.height(16.dp))
         Text("We need a few permissions to ensure your alarms ring on time and strict mode works flawlessly.", color = onSurfaceVariantDark, fontSize = 16.sp, textAlign = TextAlign.Center)
         

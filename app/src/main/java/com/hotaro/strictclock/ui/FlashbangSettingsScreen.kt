@@ -8,6 +8,8 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -18,10 +20,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.hotaro.strictclock.ui.theme.*
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -35,10 +36,8 @@ fun FlashbangSettingsScreen(onBack: () -> Unit) {
     var isBlinking by remember { mutableStateOf(prefs.getBoolean("flashbang_blinking", true)) }
     var blinkSpeed by remember { mutableStateOf(prefs.getFloat("flashbang_blink_speed", 500f)) } // ms interval
     
-    // Stored as a comma-separated string of hex colors
     val defaultColors = listOf("#FFFFFF", "#FF0000", "#FFFF00").joinToString(",")
     var selectedColorsStr by remember { mutableStateOf(prefs.getString("flashbang_colors", defaultColors) ?: defaultColors) }
-    
     val selectedColors = selectedColorsStr.split(",").filter { it.isNotEmpty() }.toMutableSet()
     
     val availableColors = listOf(
@@ -52,24 +51,25 @@ fun FlashbangSettingsScreen(onBack: () -> Unit) {
 
     BackHandler(onBack = onBack)
 
+    val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior(rememberTopAppBarState())
+
     Scaffold(
+        modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {
-            TopAppBar(
-                title = { Text("Flashbang Settings", fontWeight = FontWeight.SemiBold) },
+            LargeTopAppBar(
+                title = { Text("Flashbang") },
                 navigationIcon = {
-                    Surface(
-                        shape = CircleShape,
-                        color = primaryContainerDark,
-                        modifier = Modifier
-                            .padding(start = 16.dp, top = 8.dp, bottom = 8.dp, end = 8.dp)
-                            .size(40.dp)
-                    ) {
-                        IconButton(onClick = onBack, modifier = Modifier.fillMaxSize()) {
-                            Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back", tint = onPrimaryContainerDark, modifier = Modifier.size(24.dp))
-                        }
+                    IconButton(onClick = onBack) {
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
                     }
                 },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = backgroundDark, titleContentColor = onSurfaceDark, navigationIconContentColor = onSurfaceDark)
+                scrollBehavior = scrollBehavior,
+                colors = TopAppBarDefaults.largeTopAppBarColors(
+                    containerColor = backgroundDark,
+                    scrolledContainerColor = surfaceContainerDark,
+                    titleContentColor = onSurfaceDark,
+                    navigationIconContentColor = onSurfaceDark
+                )
             )
         },
         containerColor = backgroundDark
@@ -78,137 +78,138 @@ fun FlashbangSettingsScreen(onBack: () -> Unit) {
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
-                .padding(horizontal = 24.dp)
+                .verticalScroll(rememberScrollState())
         ) {
-            Spacer(modifier = Modifier.height(16.dp))
-
+            
             // Master Toggle
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Text("Enable Flashbang", color = onSurfaceDark, fontSize = 18.sp, fontWeight = FontWeight.Medium)
-                Switch(
-                    checked = isEnabled,
-                    onCheckedChange = { 
-                        isEnabled = it
-                        prefs.edit().putBoolean("flashbang_enabled", it).apply()
-                    }
-                )
-            }
+            ListItem(
+                headlineContent = { Text("Enable Flashbang", style = MaterialTheme.typography.titleLarge) },
+                supportingContent = { Text("Flash the screen to wake you up", style = MaterialTheme.typography.bodyMedium) },
+                trailingContent = {
+                    Switch(checked = isEnabled, onCheckedChange = null)
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable {
+                        isEnabled = !isEnabled
+                        prefs.edit().putBoolean("flashbang_enabled", isEnabled).apply()
+                    },
+                colors = ListItemDefaults.colors(containerColor = Color.Transparent, headlineColor = onSurfaceDark, supportingColor = onSurfaceVariantDark)
+            )
             
             if (isEnabled) {
-                Spacer(modifier = Modifier.height(32.dp))
+                Divider(modifier = Modifier.padding(vertical = 8.dp), color = outlineVariantDark)
                 
                 // Full Brightness Toggle
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    Column {
-                        Text("Full Display Brightness", color = onSurfaceDark, fontSize = 16.sp, fontWeight = FontWeight.Medium)
-                        Text("Maximize screen brightness while ringing", color = onSurfaceVariantDark, fontSize = 14.sp)
-                    }
-                    Switch(
-                        checked = fullBrightness,
-                        onCheckedChange = { 
-                            fullBrightness = it
-                            prefs.edit().putBoolean("flashbang_full_brightness", it).apply()
-                        }
-                    )
-                }
-                
-                Spacer(modifier = Modifier.height(32.dp))
+                ListItem(
+                    headlineContent = { Text("Full Display Brightness", style = MaterialTheme.typography.titleMedium) },
+                    supportingContent = { Text("Maximize screen brightness while ringing", style = MaterialTheme.typography.bodyMedium) },
+                    trailingContent = {
+                        Switch(checked = fullBrightness, onCheckedChange = null)
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable {
+                            fullBrightness = !fullBrightness
+                            prefs.edit().putBoolean("flashbang_full_brightness", fullBrightness).apply()
+                        },
+                    colors = ListItemDefaults.colors(containerColor = Color.Transparent, headlineColor = onSurfaceDark, supportingColor = onSurfaceVariantDark)
+                )
                 
                 // Blinking Toggle
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    Text("Blinking Effect", color = onSurfaceDark, fontSize = 16.sp, fontWeight = FontWeight.Medium)
-                    Switch(
-                        checked = isBlinking,
-                        onCheckedChange = { 
-                            isBlinking = it
-                            prefs.edit().putBoolean("flashbang_blinking", it).apply()
-                        }
-                    )
-                }
+                ListItem(
+                    headlineContent = { Text("Blinking Effect", style = MaterialTheme.typography.titleMedium) },
+                    supportingContent = { Text("Strobe the screen rather than a solid color", style = MaterialTheme.typography.bodyMedium) },
+                    trailingContent = {
+                        Switch(checked = isBlinking, onCheckedChange = null)
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable {
+                            isBlinking = !isBlinking
+                            prefs.edit().putBoolean("flashbang_blinking", isBlinking).apply()
+                        },
+                    colors = ListItemDefaults.colors(containerColor = Color.Transparent, headlineColor = onSurfaceDark, supportingColor = onSurfaceVariantDark)
+                )
                 
                 if (isBlinking) {
-                    Spacer(modifier = Modifier.height(24.dp))
-                    Text("Blink Interval: ${blinkSpeed.toInt()} ms", color = onSurfaceDark, fontSize = 14.sp)
-                    Slider(
-                        value = blinkSpeed,
-                        onValueChange = { 
-                            blinkSpeed = it 
-                            prefs.edit().putFloat("flashbang_blink_speed", it).apply()
-                        },
-                        valueRange = 100f..1000f,
-                        steps = 8
-                    )
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween
-                    ) {
-                        Text("Fast (100ms)", color = onSurfaceVariantDark, fontSize = 12.sp)
-                        Text("Slow (1000ms)", color = onSurfaceVariantDark, fontSize = 12.sp)
-                    }
-                }
-                
-                Spacer(modifier = Modifier.height(32.dp))
-                
-                // Colors Multi-select
-                Text("Flash Colors", color = primaryDark, fontSize = 14.sp, fontWeight = FontWeight.Bold)
-                Text("Select multiple colors to alternate between them", color = onSurfaceVariantDark, fontSize = 14.sp)
-                Spacer(modifier = Modifier.height(16.dp))
-                
-                LazyVerticalGrid(
-                    columns = GridCells.Fixed(3),
-                    horizontalArrangement = Arrangement.spacedBy(16.dp),
-                    verticalArrangement = Arrangement.spacedBy(16.dp),
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    items(availableColors.size) { index ->
-                        val (hexCode, name) = availableColors[index]
-                        val isSelected = selectedColors.contains(hexCode)
-                        
-                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                            Box(
-                                modifier = Modifier
-                                    .size(56.dp)
-                                    .clip(CircleShape)
-                                    .background(Color(android.graphics.Color.parseColor(hexCode)))
-                                    .border(
-                                        width = if (isSelected) 4.dp else 1.dp,
-                                        color = if (isSelected) primaryDark else onSurfaceVariantDark,
-                                        shape = CircleShape
-                                    )
-                                    .clickable {
-                                        if (isSelected && selectedColors.size > 1) {
-                                            selectedColors.remove(hexCode)
-                                        } else {
-                                            selectedColors.add(hexCode)
-                                        }
-                                        selectedColorsStr = selectedColors.joinToString(",")
-                                        prefs.edit().putString("flashbang_colors", selectedColorsStr).apply()
-                                    },
-                                contentAlignment = Alignment.Center
-                            ) {
-                                if (isSelected) {
-                                    // Use a contrasting color for the checkmark based on the background
-                                    val checkColor = if (hexCode == "#FFFFFF" || hexCode == "#FFFF00") Color.Black else Color.White
-                                    Icon(Icons.Default.Check, contentDescription = "Selected", tint = checkColor)
-                                }
-                            }
-                            Spacer(modifier = Modifier.height(8.dp))
-                            Text(name, color = onSurfaceDark, fontSize = 14.sp)
+                    Column(modifier = Modifier.padding(horizontal = 24.dp, vertical = 16.dp)) {
+                        Text("Blink Interval: ${blinkSpeed.toInt()} ms", style = MaterialTheme.typography.titleMedium, color = onSurfaceDark)
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Slider(
+                            value = blinkSpeed,
+                            onValueChange = { 
+                                blinkSpeed = it 
+                                prefs.edit().putFloat("flashbang_blink_speed", it).apply()
+                            },
+                            valueRange = 100f..1000f,
+                            steps = 8
+                        )
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween
+                        ) {
+                            Text("Fast (100ms)", style = MaterialTheme.typography.labelMedium, color = onSurfaceVariantDark)
+                            Text("Slow (1000ms)", style = MaterialTheme.typography.labelMedium, color = onSurfaceVariantDark)
                         }
                     }
                 }
+                
+                Divider(modifier = Modifier.padding(vertical = 8.dp), color = outlineVariantDark)
+                
+                // Colors Multi-select
+                Column(modifier = Modifier.padding(horizontal = 24.dp, vertical = 8.dp)) {
+                    Text("Flash Colors", style = MaterialTheme.typography.titleMedium, color = primaryDark)
+                    Text("Select multiple colors to alternate between them", style = MaterialTheme.typography.bodyMedium, color = onSurfaceVariantDark)
+                    Spacer(modifier = Modifier.height(24.dp))
+                    
+                    LazyVerticalGrid(
+                        columns = GridCells.Fixed(3),
+                        horizontalArrangement = Arrangement.spacedBy(16.dp),
+                        verticalArrangement = Arrangement.spacedBy(16.dp),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .heightIn(max = 400.dp) // Avoid infinite height in ScrollView
+                    ) {
+                        items(availableColors.size) { index ->
+                            val (hexCode, name) = availableColors[index]
+                            val isSelected = selectedColors.contains(hexCode)
+                            
+                            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                Box(
+                                    modifier = Modifier
+                                        .size(64.dp)
+                                        .clip(CircleShape)
+                                        .background(Color(android.graphics.Color.parseColor(hexCode)))
+                                        .border(
+                                            width = if (isSelected) 4.dp else 1.dp,
+                                            color = if (isSelected) primaryDark else outlineVariantDark,
+                                            shape = CircleShape
+                                        )
+                                        .clickable {
+                                            if (isSelected && selectedColors.size > 1) {
+                                                selectedColors.remove(hexCode)
+                                            } else {
+                                                selectedColors.add(hexCode)
+                                            }
+                                            selectedColorsStr = selectedColors.joinToString(",")
+                                            prefs.edit().putString("flashbang_colors", selectedColorsStr).apply()
+                                        },
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    if (isSelected) {
+                                        val checkColor = if (hexCode == "#FFFFFF" || hexCode == "#FFFF00") Color.Black else Color.White
+                                        Icon(Icons.Default.Check, contentDescription = "Selected", tint = checkColor, modifier = Modifier.size(32.dp))
+                                    }
+                                }
+                                Spacer(modifier = Modifier.height(8.dp))
+                                Text(name, style = MaterialTheme.typography.labelLarge, color = onSurfaceDark)
+                            }
+                        }
+                    }
+                }
+                
+                Spacer(modifier = Modifier.height(48.dp))
             }
         }
     }
