@@ -29,7 +29,8 @@ fun SettingsScreen(
     onNavigateToCustomisation: () -> Unit = {},
     onNavigateToMathSettings: () -> Unit = {},
     onNavigateToAiReadiness: () -> Unit = {},
-    onNavigateToAbout: () -> Unit = {}
+    onNavigateToAbout: () -> Unit = {},
+    onNavigateToAppIcons: () -> Unit = {}
 ) {
     Scaffold(
         topBar = {
@@ -133,11 +134,20 @@ fun SettingsScreen(
             Text("Appearance", color = onSurfaceDark, fontSize = 16.sp, fontWeight = FontWeight.Medium, modifier = Modifier.padding(start = 8.dp))
             Spacer(modifier = Modifier.height(16.dp))
             SettingsRow(
+                icon = Icons.Outlined.Apps,
+                title = "App Icons",
+                subtitle = "Choose your mascot",
+                showArrow = true,
+                bottomStart = 4.dp, bottomEnd = 4.dp,
+                onClick = onNavigateToAppIcons
+            )
+            Spacer(modifier = Modifier.height(2.dp))
+            SettingsRow(
                 icon = Icons.Outlined.DashboardCustomize,
                 title = "Customisation",
                 subtitle = "Input preferences and styles",
                 showArrow = true,
-                bottomStart = 4.dp, bottomEnd = 4.dp,
+                topStart = 4.dp, topEnd = 4.dp, bottomStart = 4.dp, bottomEnd = 4.dp,
                 onClick = onNavigateToCustomisation
             )
             Spacer(modifier = Modifier.height(2.dp))

@@ -51,7 +51,7 @@ fun SetupAlarmScreen(viewModel: AlarmViewModel? = null, alarm: AlarmEntity? = nu
         is24Hour = false,
     )
     
-    var selectedChallenge by remember { mutableStateOf(alarm?.challengeType ?: "QR") }
+    var selectedChallenge by remember { mutableStateOf(alarm?.challengeType ?: "None") }
     var repeatDays by remember { mutableStateOf(alarm?.daysOfWeek ?: "Daily") }
     var soundUri by remember { mutableStateOf(alarm?.soundUri ?: "") }
     var soundName by remember { mutableStateOf(alarm?.soundName ?: "Default") }
@@ -107,6 +107,10 @@ fun SetupAlarmScreen(viewModel: AlarmViewModel? = null, alarm: AlarmEntity? = nu
                 actions = {
                     Button(
                         onClick = {
+                            if (selectedChallenge == "None" || selectedChallenge == "Puzzle") {
+                                showStrictModeDialog = true
+                                return@Button
+                            }
                             if (selectedChallenge == "QR Code" && qrCodeData.isEmpty()) {
                                 showStrictModeDialog = true
                                 return@Button
