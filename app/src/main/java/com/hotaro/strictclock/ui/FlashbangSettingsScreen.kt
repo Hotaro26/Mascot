@@ -157,6 +157,22 @@ fun FlashbangSettingsScreen(onBack: () -> Unit) {
                             
                             HorizontalDivider(color = outlineVariantDark, modifier = Modifier.padding(horizontal = 16.dp))
                             
+                            // Double Tap Dismiss Toggle
+                            var doubleTapDismiss by remember { mutableStateOf(prefs.getBoolean("flashbang_double_tap_dismiss", false)) }
+                            ListItem(
+                                headlineContent = { Text("Double Tap to Dismiss", style = MaterialTheme.typography.titleMedium) },
+                                supportingContent = { Text("Double tap on the wake-up screen to turn off the flash", style = MaterialTheme.typography.bodyMedium) },
+                                trailingContent = {
+                                    Switch(checked = doubleTapDismiss, onCheckedChange = {
+                                        doubleTapDismiss = it
+                                        prefs.edit().putBoolean("flashbang_double_tap_dismiss", it).apply()
+                                    })
+                                },
+                                colors = ListItemDefaults.colors(containerColor = Color.Transparent, headlineColor = onSurfaceDark, supportingColor = onSurfaceVariantDark)
+                            )
+                            
+                            HorizontalDivider(color = outlineVariantDark, modifier = Modifier.padding(horizontal = 16.dp))
+                            
                             // Blinking Toggle
                             ListItem(
                                 headlineContent = { Text("Blinking Effect", style = MaterialTheme.typography.titleMedium) },

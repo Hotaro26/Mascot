@@ -16,6 +16,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
@@ -46,7 +48,8 @@ fun WakeUpScreen(
     val zenModeEnabled = prefs.getBoolean("zen_mode", true)
     
     // Flashbang preferences
-    val flashbangEnabled = prefs.getBoolean("flashbang_enabled", false)
+    val doubleTapDismiss = prefs.getBoolean("flashbang_double_tap_dismiss", false)
+    var localFlashbangEnabled by remember { mutableStateOf(prefs.getBoolean("flashbang_enabled", false)) }
     val fullBrightness = prefs.getBoolean("flashbang_full_brightness", true)
     val isBlinking = prefs.getBoolean("flashbang_blinking", true)
     val blinkSpeed = prefs.getFloat("flashbang_blink_speed", 500f)
@@ -71,7 +74,7 @@ fun WakeUpScreen(
     val defaultBgColor = backgroundDark
     var currentFlashColor by remember { mutableStateOf(defaultBgColor) }
 
-    if (flashbangEnabled) {
+    if (localFlashbangEnabled) {
         val activity = context as? android.app.Activity
         if (fullBrightness) {
             LaunchedEffect(Unit) {
@@ -119,7 +122,23 @@ fun WakeUpScreen(
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .background(if (flashbangEnabled) Color.Black.copy(alpha = 0.4f) else Color.Transparent)
+                .background(if (localFlashbangEnabled) Color.Black.copy(alpha = 0.4f) else Color.Transparent)
+                .pointerInput(Unit) {
+                    detectTapGestures(
+                        onDoubleTap = {
+                            if (localFlashbangEnabled && doubleTapDismiss) {
+                                localFlashbangEnabled = false
+                                currentFlashColor = defaultBgColor
+                                
+                                val activity = context as? android.app.Activity
+                                val window = activity?.window
+                                val layoutParams = window?.attributes
+                                layoutParams?.screenBrightness = android.view.WindowManager.LayoutParams.BRIGHTNESS_OVERRIDE_NONE
+                                window?.attributes = layoutParams
+                            }
+                        }
+                    )
+                }
         ) {
             Column(
             modifier = Modifier
