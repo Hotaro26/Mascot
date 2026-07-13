@@ -34,7 +34,7 @@ class TimerService : Service() {
     private fun createNotificationChannel() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val channel = NotificationChannel(
-                "timer_channel",
+                "timer_channel_v2",
                 "mascot Timer",
                 NotificationManager.IMPORTANCE_LOW
             )
@@ -149,7 +149,7 @@ class TimerService : Service() {
 
         val progress = if (maxMs > 0) (remainingMs.toFloat() / maxMs.toFloat() * 100).toInt() else 0
 
-        val builder = NotificationCompat.Builder(this, "timer_channel")
+        val builder = NotificationCompat.Builder(this, "timer_channel_v2")
             .setContentTitle("Timer: $timeStr")
             .setContentText("Time remaining")
             .setSmallIcon(android.R.drawable.ic_menu_recent_history)

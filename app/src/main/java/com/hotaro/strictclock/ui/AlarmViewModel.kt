@@ -21,20 +21,7 @@ class AlarmViewModel(
     val allAlarms: StateFlow<List<AlarmEntity>> = repository.allAlarms
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
-    init {
-        viewModelScope.launch {
-            val alarms = repository.allAlarms.first()
-            if (alarms.isEmpty()) {
-                val a1 = AlarmEntity(timeHour = 6, timeMinute = 0, daysOfWeek = "Mon-Fri", isActive = true, challengeType = "QR")
-                val a2 = AlarmEntity(timeHour = 8, timeMinute = 30, daysOfWeek = "Sat-Sun", isActive = false, challengeType = "QR")
-                val a3 = AlarmEntity(timeHour = 21, timeMinute = 0, daysOfWeek = "Daily", isActive = false, challengeType = "QR")
-                val id1 = repository.insert(a1)
-                repository.insert(a2)
-                repository.insert(a3)
-                scheduler.schedule(a1.copy(id = id1.toInt()))
-            }
-        }
-    }
+
 
     fun insert(alarm: AlarmEntity) = viewModelScope.launch {
         val id = repository.insert(alarm)

@@ -43,7 +43,7 @@ class AlarmService : Service() {
     private fun createNotificationChannel() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val channel = NotificationChannel(
-                "alarm_channel",
+                "alarm_channel_v2",
                 "mascot Alarms",
                 NotificationManager.IMPORTANCE_HIGH
             )
@@ -96,7 +96,7 @@ class AlarmService : Service() {
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
 
-        val notification = NotificationCompat.Builder(this, "alarm_channel")
+        val notification = NotificationCompat.Builder(this, "alarm_channel_v2")
             .setContentTitle("mascot Alarm")
             .setContentText("Wake up! Challenge: $challengeType")
             .setSmallIcon(android.R.drawable.ic_lock_idle_alarm)
