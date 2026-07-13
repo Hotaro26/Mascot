@@ -74,6 +74,8 @@ wanna add a new feature or fix a bug? bet. i'm totally down for pull requests.
 4. push to your fork and open a PR.
 
 just make sure your code isn't super messy and you're good to go.
+## Localization:
+[Help translate the Mascot App on Crowdin](https://crowdin.com/project/mascot-app)
 
 ### License
 
