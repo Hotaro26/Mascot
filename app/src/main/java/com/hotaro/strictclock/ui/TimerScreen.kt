@@ -49,9 +49,12 @@ fun TimerScreen() {
     val prefs = context.getSharedPreferences("strict_clock_prefs", android.content.Context.MODE_PRIVATE)
     val useKeyboardTimeInput = prefs.getBoolean("use_keyboard_time_input", false)
     
+    val initialHour = prefs.getInt("timer_hour", 0)
+    val initialMinute = prefs.getInt("timer_minute", 15)
+    
     val timePickerState = rememberTimePickerState(
-        initialHour = 0,
-        initialMinute = 15,
+        initialHour = initialHour,
+        initialMinute = initialMinute,
         is24Hour = true,
     )
     
@@ -228,6 +231,11 @@ fun TimerScreen() {
                             onClick = {
                                 val totalMs = (h * 60 * 60 + m * 60) * 1000L
                                 if (totalMs > 0) {
+                                    prefs.edit()
+                                        .putInt("timer_hour", h)
+                                        .putInt("timer_minute", m)
+                                        .apply()
+                                        
                                     val intent = Intent(context, TimerService::class.java)
                                     intent.action = TimerService.ACTION_START
                                     intent.putExtra(TimerService.EXTRA_DURATION_MS, totalMs)

@@ -27,16 +27,18 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
+import android.content.Intent
+import androidx.compose.ui.platform.LocalContext
+import com.hotaro.strictclock.service.StopwatchManager
+import com.hotaro.strictclock.service.StopwatchService
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun StopwatchTabContent(
-    viewModel: StopwatchViewModel = viewModel()
-) {
-    val elapsedMillis by viewModel.elapsedMillis.collectAsState()
-    val isRunning by viewModel.isRunning.collectAsState()
-    val laps by viewModel.laps.collectAsState()
+fun StopwatchTabContent() {
+    val context = LocalContext.current
+    val elapsedMillis by StopwatchManager.elapsedMillis.collectAsState()
+    val isRunning by StopwatchManager.isRunning.collectAsState()
+    val laps by StopwatchManager.laps.collectAsState()
 
     val minutes = (elapsedMillis / 1000 / 60)
     val seconds = (elapsedMillis / 1000) % 60
@@ -107,7 +109,11 @@ fun StopwatchTabContent(
             ) {
                 // Reset Button
                 IconButton(
-                    onClick = { viewModel.reset() },
+                    onClick = { 
+                        val intent = Intent(context, StopwatchService::class.java)
+                        intent.action = StopwatchService.ACTION_RESET
+                        context.startService(intent)
+                    },
                     modifier = Modifier
                         .size(64.dp)
                         .clip(CircleShape)
@@ -130,7 +136,15 @@ fun StopwatchTabContent(
                 )
 
                 IconButton(
-                    onClick = { viewModel.toggle() },
+                    onClick = { 
+                        val intent = Intent(context, StopwatchService::class.java)
+                        intent.action = if (isRunning) StopwatchService.ACTION_PAUSE else StopwatchService.ACTION_START
+                        if (!isRunning && android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+                            context.startForegroundService(intent)
+                        } else {
+                            context.startService(intent)
+                        }
+                    },
                     modifier = Modifier
                         .width(120.dp)
                         .height(80.dp)
@@ -147,7 +161,11 @@ fun StopwatchTabContent(
 
                 // Lap Button
                 IconButton(
-                    onClick = { viewModel.lap() },
+                    onClick = { 
+                        val intent = Intent(context, StopwatchService::class.java)
+                        intent.action = StopwatchService.ACTION_LAP
+                        context.startService(intent)
+                    },
                     modifier = Modifier
                         .size(64.dp)
                         .clip(CircleShape)
