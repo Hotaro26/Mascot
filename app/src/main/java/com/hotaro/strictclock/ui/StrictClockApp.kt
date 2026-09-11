@@ -86,7 +86,7 @@ fun StrictClockApp(isWakeUp: Boolean = false, challengeType: String = "None", qr
     }
     
     val prefs = context.getSharedPreferences("strict_clock_prefs", android.content.Context.MODE_PRIVATE)
-    val predictiveBackEnabled = prefs.getBoolean("predictive_back_enabled", false)
+    val predictiveBackEnabled = prefs.getBoolean("predictive_back_enabled", true)
     val isRootScreen = currentScreen == "Dashboard" || currentScreen == "Alarms" || currentScreen == "Clock" || currentScreen == "Stopwatch" || currentScreen == "Timer" || currentScreen == "Settings"
     
     if (isRootScreen && !predictiveBackEnabled) {

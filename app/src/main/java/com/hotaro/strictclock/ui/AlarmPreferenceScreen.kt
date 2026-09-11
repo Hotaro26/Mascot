@@ -12,6 +12,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import com.hotaro.strictclock.ui.theme.*
+import androidx.activity.compose.BackHandler
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.sp
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -22,16 +26,24 @@ fun AlarmPreferenceScreen(onBack: () -> Unit) {
     var autoDelete by remember { mutableStateOf(prefs.getBoolean("auto_delete_one_time", false)) }
     var noSwipeConfirm by remember { mutableStateOf(prefs.getBoolean("no_swipe_delete_confirm", false)) }
 
+    BackHandler { onBack() }
+
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Alarm Preferences", color = onSurfaceDark) },
+                title = { Text("Alarm Preferences", fontWeight = FontWeight.Bold, color = onSurfaceDark, fontSize = 20.sp) },
                 navigationIcon = {
-                    IconButton(onClick = onBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back", tint = onSurfaceDark)
+                    Surface(
+                        shape = androidx.compose.foundation.shape.CircleShape,
+                        color = primaryContainerDark,
+                        modifier = Modifier.padding(start = 16.dp, top = 8.dp, bottom = 8.dp, end = 8.dp).size(40.dp)
+                    ) {
+                        IconButton(onClick = onBack, modifier = Modifier.fillMaxSize()) {
+                            Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back", tint = onPrimaryContainerDark, modifier = Modifier.size(24.dp))
+                        }
                     }
                 },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = backgroundDark)
+                colors = TopAppBarDefaults.topAppBarColors(containerColor = backgroundDark, titleContentColor = onSurfaceDark)
             )
         },
         containerColor = backgroundDark

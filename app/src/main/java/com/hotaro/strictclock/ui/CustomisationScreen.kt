@@ -59,7 +59,7 @@ fun CustomisationScreen(onBack: () -> Unit) {
             Spacer(modifier = Modifier.height(24.dp))
             
             var predictiveBack by remember { 
-                mutableStateOf(prefs.getBoolean("predictive_back_enabled", false)) 
+                mutableStateOf(prefs.getBoolean("predictive_back_enabled", true)) 
             }
             
             SettingsRowSwitch(
