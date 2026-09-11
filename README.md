@@ -22,10 +22,29 @@ Mascot makes you do annoying stuff like solving math problems, scanning random Q
 - **Predictive Back Gestures & Minimalist UI:** built with Jetpack Compose Material 3, squishy cards, custom mascot icons, and a super clean dark mode.
 - **Strict Mode:** locks down your alarm settings so you can't cheat and change the time 5 minutes before it rings.
 
-oh, and if you hate oversleeping and actually find this app useful, dropping a star on the repo would be sick.
+> oh, and if you hate oversleeping and actually find this app useful, dropping a ⭐ star on the repo would be sick.
+
+<div align="center">
+  
 ## Screenshots
+<table>
+  <tr>
+    <td><img src="https://github.com/user-attachments/assets/294841f6-b569-48f2-87f1-814d2e0c23ba" width="250"></td>
+    <td><img src="https://github.com/user-attachments/assets/6c62f443-db78-4d8c-b27e-0bd910e30bdc" width="250"></td>
+    <td><img src="https://github.com/user-attachments/assets/471d60ee-06d8-426a-9489-b01d1bba4781" width="250"></td>
+  </tr>
+  <tr>
+    <td><img src="https://github.com/user-attachments/assets/223e8bb2-88f8-4d04-8c69-c260d872d77e" width="250"></td>
+    <td><img src="https://github.com/user-attachments/assets/8ac1e114-e1fe-4844-a83d-3970e14327ff" width="250"></td>
+    <td><img src="https://github.com/user-attachments/assets/a2b01678-f239-4efd-8293-b28637ea7dd3" width="250"></td>
+  </tr>
+</table>
 
+</div>
 
+<details>
+  <summary>Old Screenshots</summary>
+## Screenshots
 | | | | | |
 |:---:|:---:|:---:|:---:|:---:|
 | <img width="200" alt="Screenshot_20260711-215802_mascot" src="https://github.com/user-attachments/assets/cad64fa7-68c2-4c18-a707-91a6bd1e769b" /> | <img width="200" alt="Screenshot_20260711-215807_mascot" src="https://github.com/user-attachments/assets/6b74c0fb-a328-492f-bee0-4e6b016bee27" /> | <img width="200" alt="Screenshot_20260711-182217_mastco" src="https://github.com/user-attachments/assets/8cbe5b5e-1f39-4e05-9bba-2b2bf5346353" /> | <img width="200" alt="Screenshot_20260711-182400_mastco" src="https://github.com/user-attachments/assets/2b074c5d-5c27-41c6-ba2e-989f2195ca3e" /> | <img width="200" alt="Screenshot_20260711-182600_mastco" src="https://github.com/user-attachments/assets/28e67025-5613-4b23-870d-a1c92d5fe6d4" /> |
@@ -37,7 +56,7 @@ oh, and if you hate oversleeping and actually find this app useful, dropping a s
 |:---:|:---:|:---:|
 | <img width="300" alt="Screenshot_20260711-220644_mascot" src="https://github.com/user-attachments/assets/977a7b2d-b7d1-4492-b2cb-ad6849227eed" /> | <img width="300" alt="Screenshot_20260711-220540_mascot" src="https://github.com/user-attachments/assets/f04bb148-f266-4a79-bedc-095fc4fc0f93" /> | <img width="300" alt="Screenshot_20260711-220556_mascot" src="https://github.com/user-attachments/assets/4be1607d-bf21-49d4-9993-6eedec8916bd" /> |
 | <img width="300" alt="Screenshot_20260711-220609_mascot" src="https://github.com/user-attachments/assets/eca9f55c-c7ca-4cf7-91a7-1229c392ef68" /> | <img width="300" alt="Screenshot_20260711-220629_mascot" src="https://github.com/user-attachments/assets/331936a5-c852-4a90-b157-1114ccaed223" /> | <img width="300" alt="Screenshot_20260711-220637_mascot" src="https://github.com/user-attachments/assets/7a81fbb2-2b89-4745-b681-51f3dc9c56d3" /> |
-
+</details>
 
 
 ### What's under the hood?
