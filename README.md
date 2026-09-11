@@ -44,6 +44,7 @@ Mascot makes you do annoying stuff like solving math problems, scanning random Q
 
 <details>
   <summary>Old Screenshots</summary>
+  
 ## Screenshots
 | | | | | |
 |:---:|:---:|:---:|:---:|:---:|
