@@ -71,6 +71,7 @@ fun QrManagementScreen(onBack: () -> Unit) {
     var currentNameInput by remember { mutableStateOf("") }
     
     Scaffold(
+        contentWindowInsets = androidx.compose.foundation.layout.WindowInsets.systemBars.only(androidx.compose.foundation.layout.WindowInsetsSides.Horizontal + androidx.compose.foundation.layout.WindowInsetsSides.Top),
         topBar = {
             TopAppBar(
                 title = { Text("Manage QR Codes", fontWeight = FontWeight.SemiBold) },

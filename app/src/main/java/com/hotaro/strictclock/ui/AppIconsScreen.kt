@@ -47,6 +47,7 @@ fun AppIconsScreen(onBack: () -> Unit) {
     )
 
     Scaffold(
+        contentWindowInsets = androidx.compose.foundation.layout.WindowInsets.systemBars.only(androidx.compose.foundation.layout.WindowInsetsSides.Horizontal + androidx.compose.foundation.layout.WindowInsetsSides.Top),
         topBar = {
             TopAppBar(
                 title = { Text("App Icons", fontWeight = FontWeight.Bold, color = onSurfaceDark, fontSize = 20.sp) },

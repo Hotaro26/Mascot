@@ -93,6 +93,7 @@ fun SetupAlarmScreen(viewModel: AlarmViewModel? = null, alarm: AlarmEntity? = nu
     val useKeyboardTimeInput = prefs.getBoolean("use_keyboard_time_input", false)
 
     Scaffold(
+        contentWindowInsets = androidx.compose.foundation.layout.WindowInsets.systemBars.only(androidx.compose.foundation.layout.WindowInsetsSides.Horizontal + androidx.compose.foundation.layout.WindowInsetsSides.Top),
         topBar = {
             TopAppBar(
                 title = { Text("Setup Strict Alarm", fontWeight = FontWeight.Bold, fontSize = 20.sp) },

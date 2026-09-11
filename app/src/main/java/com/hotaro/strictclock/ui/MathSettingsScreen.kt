@@ -36,6 +36,7 @@ fun MathSettingsScreen(onBack: () -> Unit) {
     BackHandler(onBack = onBack)
 
     Scaffold(
+        contentWindowInsets = androidx.compose.foundation.layout.WindowInsets.systemBars.only(androidx.compose.foundation.layout.WindowInsetsSides.Horizontal + androidx.compose.foundation.layout.WindowInsetsSides.Top),
         topBar = {
             TopAppBar(
                 title = { Text("Math Challenge Settings", fontWeight = FontWeight.SemiBold) },

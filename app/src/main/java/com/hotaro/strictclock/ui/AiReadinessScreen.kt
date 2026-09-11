@@ -27,6 +27,7 @@ fun AiReadinessScreen(onBack: () -> Unit) {
     var showTargetsDialog by remember { mutableStateOf(false) }
     BackHandler { onBack() }
     Scaffold(
+        contentWindowInsets = androidx.compose.foundation.layout.WindowInsets.systemBars.only(androidx.compose.foundation.layout.WindowInsetsSides.Horizontal + androidx.compose.foundation.layout.WindowInsetsSides.Top),
         topBar = {
             TopAppBar(
                 title = { Text("AI Readiness", fontWeight = FontWeight.Bold, fontSize = 20.sp) },

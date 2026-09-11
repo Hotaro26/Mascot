@@ -104,6 +104,7 @@ fun WakeUpStreakScreen(onBack: () -> Unit) {
     }
 
     Scaffold(
+        contentWindowInsets = androidx.compose.foundation.layout.WindowInsets.systemBars.only(androidx.compose.foundation.layout.WindowInsetsSides.Horizontal + androidx.compose.foundation.layout.WindowInsetsSides.Top),
         topBar = {
             TopAppBar(
                 title = { Text("Wake-up Streak", fontWeight = FontWeight.Bold, fontSize = 20.sp) },

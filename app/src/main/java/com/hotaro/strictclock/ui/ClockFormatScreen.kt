@@ -26,6 +26,7 @@ fun ClockFormatScreen(onBack: () -> Unit) {
     var clockFormat by remember { mutableStateOf(prefs.getString("clock_format", "12") ?: "12") }
 
     Scaffold(
+        contentWindowInsets = androidx.compose.foundation.layout.WindowInsets.systemBars.only(androidx.compose.foundation.layout.WindowInsetsSides.Horizontal + androidx.compose.foundation.layout.WindowInsetsSides.Top),
         topBar = {
             TopAppBar(
                 title = { Text("Clock Format", fontWeight = FontWeight.Bold, fontSize = 20.sp, color = onSurfaceDark) },

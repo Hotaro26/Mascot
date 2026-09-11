@@ -73,6 +73,7 @@ fun ZenModeScreen(onBack: () -> Unit) {
     }
 
     Scaffold(
+        contentWindowInsets = androidx.compose.foundation.layout.WindowInsets.systemBars.only(androidx.compose.foundation.layout.WindowInsetsSides.Horizontal + androidx.compose.foundation.layout.WindowInsetsSides.Top),
         topBar = {
             TopAppBar(
                 title = { Text("Zen Mode", fontWeight = FontWeight.Bold, fontSize = 20.sp, color = onSurfaceDark) },
