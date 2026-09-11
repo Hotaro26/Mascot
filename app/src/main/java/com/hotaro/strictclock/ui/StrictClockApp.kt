@@ -49,6 +49,7 @@ fun StrictClockApp(isWakeUp: Boolean = false, challengeType: String = "None", qr
         hasNotif && hasCam && hasExact
     }
     
+    val settingsScrollState = androidx.compose.foundation.rememberScrollState()
     var currentScreen by remember { mutableStateOf(if (isWakeUp) "WakeUp" else if (!hasAllPermissions) "Permissions" else "Clock") }
     var selectedAlarm by remember { mutableStateOf<com.hotaro.strictclock.data.AlarmEntity?>(null) }
     
@@ -247,7 +248,8 @@ fun StrictClockApp(isWakeUp: Boolean = false, challengeType: String = "None", qr
                         onNavigateToAiReadiness = { currentScreen = "AiReadiness" },
                         onNavigateToAbout = { currentScreen = "About" },
                         onNavigateToAppIcons = { currentScreen = "AppIcons" },
-                        onNavigateToClockFormat = { currentScreen = "ClockFormat" }
+                        onNavigateToClockFormat = { currentScreen = "ClockFormat" },
+                        scrollState = settingsScrollState
                     )
                     "AppIcons" -> AppIconsScreen(onBack = { currentScreen = "Settings" })
                     "WakeUpStreak" -> WakeUpStreakScreen(onBack = { currentScreen = "Settings" })

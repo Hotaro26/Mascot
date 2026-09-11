@@ -35,14 +35,15 @@ fun SettingsScreen(
     onNavigateToAiReadiness: () -> Unit = {},
     onNavigateToAbout: () -> Unit = {},
     onNavigateToAppIcons: () -> Unit = {},
-    onNavigateToClockFormat: () -> Unit = {}
+    onNavigateToClockFormat: () -> Unit = {},
+    scrollState: androidx.compose.foundation.ScrollState = androidx.compose.foundation.rememberScrollState()
 ) {
     Column(
         modifier = Modifier
             .fillMaxSize()
             .background(backgroundDark)
             .padding(horizontal = 16.dp)
-            .verticalScroll(rememberScrollState())
+            .verticalScroll(scrollState)
     ) {
             Spacer(modifier = Modifier.height(24.dp))
             Text("Settings", fontWeight = FontWeight.Bold, color = onSurfaceDark, fontSize = 28.sp)
