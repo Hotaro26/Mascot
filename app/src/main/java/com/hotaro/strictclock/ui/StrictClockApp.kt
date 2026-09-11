@@ -186,6 +186,19 @@ fun StrictClockApp(isWakeUp: Boolean = false, challengeType: String = "None", qr
                                 val serviceIntent = android.content.Intent(context, com.hotaro.strictclock.service.AlarmService::class.java)
                                 context.stopService(serviceIntent)
                                 
+                                val activeAlarmId = if (com.hotaro.strictclock.service.AlarmService.isRinging) com.hotaro.strictclock.service.AlarmService.currentAlarmId else activity.intent.getIntExtra("ALARM_ID", -1)
+                                if (activeAlarmId != -1) {
+                                    Thread {
+                                        kotlinx.coroutines.runBlocking {
+                                            val repo = com.hotaro.strictclock.data.AlarmRepository(com.hotaro.strictclock.data.AppDatabase.getDatabase(context).alarmDao())
+                                            val alarm = repo.getAlarmById(activeAlarmId)
+                                            if (alarm != null && alarm.daysOfWeek == "Never") {
+                                                repo.update(alarm.copy(isActive = false))
+                                            }
+                                        }
+                                    }.start()
+                                }
+                                
                                 val prefs = context.getSharedPreferences("strict_clock_prefs", android.content.Context.MODE_PRIVATE)
                                 val currentStreak = prefs.getInt("wake_up_streak", 0)
                                 val lastDate = prefs.getString("last_streak_date", "")
