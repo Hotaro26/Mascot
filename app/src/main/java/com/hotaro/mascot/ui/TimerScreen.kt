@@ -321,7 +321,7 @@ fun TimerScreen() {
                         ) {
                             // Circular Progress
                             val progress = if (maxTime > 0) timeRemaining.toFloat() / maxTime.toFloat() else 0f
-                            val outlineColor = outlineVariantDark
+                            val trackColor = primaryContainerDark
                             val progressColor = primaryDark
 
                             // Animated wave phase for the fluid wavy effect
@@ -330,7 +330,7 @@ fun TimerScreen() {
                                 initialValue = 0f,
                                 targetValue = 2f * PI.toFloat(),
                                 animationSpec = infiniteRepeatable(
-                                    animation = tween(3000, easing = LinearEasing),
+                                    animation = tween(4000, easing = LinearEasing),
                                     repeatMode = RepeatMode.Restart
                                 ),
                                 label = "wave_phase"
@@ -339,10 +339,10 @@ fun TimerScreen() {
                             androidx.compose.foundation.Canvas(modifier = Modifier.fillMaxSize()) {
                                 val centerX = size.width / 2f
                                 val centerY = size.height / 2f
-                                val radius = size.minDimension / 2f - 8.dp.toPx()
-                                val strokeWidth = 8.dp.toPx()
-                                val waveAmplitude = 4.dp.toPx()
-                                val waveFrequency = 8f
+                                val strokeWidth = 16.dp.toPx() // M3 Expressive bold stroke
+                                val radius = size.minDimension / 2f - strokeWidth
+                                val waveAmplitude = 8.dp.toPx() // Deeper, organic wave
+                                val waveFrequency = 6f // Wider waves
 
                                 // Background wavy circle (full ring)
                                 val bgPath = Path()
@@ -357,10 +357,11 @@ fun TimerScreen() {
                                 bgPath.close()
                                 drawPath(
                                     bgPath,
-                                    color = outlineColor,
+                                    color = trackColor.copy(alpha = 0.5f),
                                     style = androidx.compose.ui.graphics.drawscope.Stroke(
                                         width = strokeWidth,
-                                        cap = androidx.compose.ui.graphics.StrokeCap.Round
+                                        cap = androidx.compose.ui.graphics.StrokeCap.Round,
+                                        join = androidx.compose.ui.graphics.StrokeJoin.Round
                                     )
                                 )
 
@@ -382,7 +383,8 @@ fun TimerScreen() {
                                         color = progressColor,
                                         style = androidx.compose.ui.graphics.drawscope.Stroke(
                                             width = strokeWidth,
-                                            cap = androidx.compose.ui.graphics.StrokeCap.Round
+                                            cap = androidx.compose.ui.graphics.StrokeCap.Round,
+                                            join = androidx.compose.ui.graphics.StrokeJoin.Round
                                         )
                                     )
                                 }
