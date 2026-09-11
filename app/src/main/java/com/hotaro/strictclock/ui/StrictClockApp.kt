@@ -104,12 +104,21 @@ fun StrictClockApp(isWakeUp: Boolean = false, challengeType: String = "None", qr
     val density = androidx.compose.ui.platform.LocalDensity.current
     var bottomNavOffset by remember { mutableStateOf(0f) }
     val maxBottomNavOffset = with(density) { 120.dp.toPx() } // Hide distance
-    val nestedScrollConnection = remember {
+    
+    LaunchedEffect(currentScreen) {
+        if (currentScreen != "Settings") {
+            bottomNavOffset = 0f
+        }
+    }
+    
+    val nestedScrollConnection = remember(currentScreen) {
         object : androidx.compose.ui.input.nestedscroll.NestedScrollConnection {
             override fun onPreScroll(available: androidx.compose.ui.geometry.Offset, source: androidx.compose.ui.input.nestedscroll.NestedScrollSource): androidx.compose.ui.geometry.Offset {
-                val delta = available.y
-                val newOffset = bottomNavOffset - delta
-                bottomNavOffset = newOffset.coerceIn(0f, maxBottomNavOffset)
+                if (currentScreen == "Settings") {
+                    val delta = available.y
+                    val newOffset = bottomNavOffset - delta
+                    bottomNavOffset = newOffset.coerceIn(0f, maxBottomNavOffset)
+                }
                 return androidx.compose.ui.geometry.Offset.Zero
             }
         }
