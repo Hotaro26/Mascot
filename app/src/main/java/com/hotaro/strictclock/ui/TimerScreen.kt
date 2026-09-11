@@ -220,9 +220,9 @@ fun TimerScreen() {
                     shape = androidx.compose.foundation.shape.RoundedCornerShape(cornerRadius),
                     color = primaryDark,
                     modifier = Modifier
+                        .padding(bottom = 64.dp)
                         .height(88.dp)
                         .width(200.dp)
-                        .padding(bottom = 16.dp)
                 ) {
                     Row(
                         modifier = Modifier.fillMaxSize(),
@@ -384,6 +384,8 @@ fun TimerScreen() {
                                 )
                             }
                         }
+                        
+                        Spacer(modifier = Modifier.height(32.dp))
                     }
                 }
                 
