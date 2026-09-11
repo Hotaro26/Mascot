@@ -1,0 +1,71 @@
+package com.hotaro.mascot
+
+import android.os.Build
+import android.os.Bundle
+import android.view.WindowManager
+import androidx.activity.ComponentActivity
+import androidx.activity.compose.setContent
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import com.hotaro.mascot.ui.theme.StrictClockTheme
+import androidx.compose.ui.Modifier
+import com.hotaro.mascot.ui.StrictClockApp
+import com.hotaro.mascot.service.AlarmService
+
+import androidx.activity.enableEdgeToEdge
+import androidx.core.view.WindowCompat
+import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.launch
+
+class MainActivity : ComponentActivity() {
+    override fun onCreate(savedInstanceState: Bundle?) {
+        enableEdgeToEdge()
+        super.onCreate(savedInstanceState)
+        
+        lifecycleScope.launch {
+            UpdateChecker.check(this@MainActivity, BuildConfig.VERSION_NAME)
+        }
+        window.statusBarColor = android.graphics.Color.TRANSPARENT
+        window.navigationBarColor = android.graphics.Color.TRANSPARENT
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+            window.navigationBarDividerColor = android.graphics.Color.TRANSPARENT
+        }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            window.isNavigationBarContrastEnforced = false
+        }
+        val isWakeUp = intent.getBooleanExtra("IS_WAKE_UP", false) || AlarmService.isRinging
+        val challengeType = intent.getStringExtra("CHALLENGE_TYPE")?.takeIf { it != "None" } ?: if (AlarmService.isRinging) AlarmService.currentChallengeType else "None"
+        val qrCodeData = intent.getStringExtra("QR_CODE_DATA")?.takeIf { it.isNotEmpty() } ?: if (AlarmService.isRinging) AlarmService.currentQrCodeData else ""
+        val qrCodeName = intent.getStringExtra("QR_CODE_NAME")?.takeIf { it.isNotEmpty() } ?: if (AlarmService.isRinging) AlarmService.currentQrCodeName else ""
+        val cameraObject = intent.getStringExtra("CAMERA_OBJECT")?.takeIf { it.isNotEmpty() } ?: if (AlarmService.isRinging) AlarmService.currentCameraObject else ""
+        val mathOperations = intent.getStringExtra("MATH_OPERATIONS")?.takeIf { it.isNotEmpty() } ?: if (AlarmService.isRinging) AlarmService.currentMathOperations else ""
+        val mathDifficulty = intent.getStringExtra("MATH_DIFFICULTY")?.takeIf { it.isNotEmpty() } ?: if (AlarmService.isRinging) AlarmService.currentMathDifficulty else ""
+
+        if (isWakeUp) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) {
+                setShowWhenLocked(true)
+                setTurnScreenOn(true)
+            } else {
+                @Suppress("DEPRECATION")
+                window.addFlags(
+                    WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED or
+                    WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON
+                )
+            }
+            window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+        }
+
+        setContent {
+            StrictClockTheme {
+                // A surface container using the 'background' color from the theme
+                Surface(
+                    modifier = Modifier.fillMaxSize(),
+                    color = MaterialTheme.colorScheme.background
+                ) {
+                    StrictClockApp(isWakeUp = isWakeUp, challengeType = challengeType, qrCodeData = qrCodeData, qrCodeName = qrCodeName, cameraObject = cameraObject, mathOperations = mathOperations, mathDifficulty = mathDifficulty)
+                }
+            }
+        }
+    }
+}

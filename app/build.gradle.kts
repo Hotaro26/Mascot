@@ -5,11 +5,11 @@ plugins {
 }
 
 android {
-    namespace = "com.hotaro.strictclock"
+    namespace = "com.hotaro.mascot"
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "com.hotaro.strictclock"
+        applicationId = "com.hotaro.mascot"
         minSdk = 26
         targetSdk = 34
         versionCode = 6
