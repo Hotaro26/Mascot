@@ -53,7 +53,7 @@ fun SetupAlarmScreen(viewModel: AlarmViewModel? = null, alarm: AlarmEntity? = nu
     )
     
     var selectedChallenge by remember { mutableStateOf(alarm?.challengeType ?: "None") }
-    var repeatDays by remember { mutableStateOf(alarm?.daysOfWeek ?: "Daily") }
+    var repeatDays by remember { mutableStateOf(alarm?.daysOfWeek ?: "Never") }
     var soundUri by remember { mutableStateOf(alarm?.soundUri ?: "") }
     var soundName by remember { mutableStateOf(alarm?.soundName ?: "Default") }
     var vibrationEnabled by remember { mutableStateOf(alarm?.vibrationEnabled ?: true) }
@@ -271,8 +271,67 @@ fun SetupAlarmScreen(viewModel: AlarmViewModel? = null, alarm: AlarmEntity? = nu
             
             Spacer(modifier = Modifier.height(32.dp))
             
-            SettingsRow(icon = Icons.Outlined.Repeat, title = "Repeat", subtitle = repeatDays, showArrow = true) {
-                showRepeatDialog = true
+            Text("Repeat", fontSize = 16.sp, fontWeight = FontWeight.SemiBold, color = onSurfaceDark)
+            Spacer(modifier = Modifier.height(8.dp))
+            
+            val daysList = listOf("Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat")
+            val initialSelected = when (repeatDays) {
+                "Daily" -> daysList.toSet()
+                "Mon-Fri" -> setOf("Mon", "Tue", "Wed", "Thu", "Fri")
+                "Sat-Sun" -> setOf("Sat", "Sun")
+                "Never" -> emptySet()
+                else -> repeatDays.split(", ").toSet()
+            }
+            
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Surface(
+                    shape = RoundedCornerShape(12.dp),
+                    color = if (initialSelected.isEmpty()) primaryContainerDark else surfaceContainerHighDark,
+                    modifier = Modifier.size(40.dp).clickable {
+                        repeatDays = "Never"
+                    }
+                ) {
+                    Box(contentAlignment = Alignment.Center) {
+                        Icon(
+                            Icons.Outlined.Block,
+                            contentDescription = "Ring Once",
+                            tint = if (initialSelected.isEmpty()) onPrimaryContainerDark else onSurfaceVariantDark,
+                            modifier = Modifier.size(20.dp)
+                        )
+                    }
+                }
+                
+                val dayInitials = listOf("S", "M", "T", "W", "T", "F", "S")
+                daysList.forEachIndexed { index, day ->
+                    val isSelected = initialSelected.contains(day)
+                    Surface(
+                        shape = RoundedCornerShape(12.dp),
+                        color = if (isSelected) primaryContainerDark else surfaceContainerHighDark,
+                        modifier = Modifier.size(40.dp).clickable {
+                            val newSelection = if (isSelected) initialSelected - day else initialSelected + day
+                            repeatDays = when (newSelection.size) {
+                                7 -> "Daily"
+                                0 -> "Never"
+                                5 -> if (newSelection.containsAll(listOf("Mon", "Tue", "Wed", "Thu", "Fri"))) "Mon-Fri" else daysList.filter { newSelection.contains(it) }.joinToString(", ")
+                                2 -> if (newSelection.containsAll(listOf("Sat", "Sun"))) "Sat-Sun" else daysList.filter { newSelection.contains(it) }.joinToString(", ")
+                                else -> daysList.filter { newSelection.contains(it) }.joinToString(", ")
+                            }
+                        }
+                    ) {
+                        Box(contentAlignment = Alignment.Center) {
+                            Text(
+                                text = dayInitials[index],
+                                color = if (isSelected) onPrimaryContainerDark else onSurfaceVariantDark,
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 14.sp
+                            )
+                        }
+                    }
+                }
             }
             Spacer(modifier = Modifier.height(8.dp))
             SettingsRow(icon = Icons.Outlined.Notifications, title = "Alarm Sound", subtitle = soundName, showArrow = true) {
@@ -356,52 +415,7 @@ fun SetupAlarmScreen(viewModel: AlarmViewModel? = null, alarm: AlarmEntity? = nu
             Spacer(modifier = Modifier.height(32.dp))
         }
         
-        if (showRepeatDialog) {
-            val days = listOf("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")
-            var selectedDays by remember { mutableStateOf(
-                when (repeatDays) {
-                    "Daily" -> days.toSet()
-                    "Mon-Fri" -> setOf("Mon", "Tue", "Wed", "Thu", "Fri")
-                    "Sat-Sun" -> setOf("Sat", "Sun")
-                    "Never" -> emptySet()
-                    else -> repeatDays.split(", ").toSet()
-                }
-            ) }
-            
-            AlertDialog(
-                onDismissRequest = { showRepeatDialog = false },
-                title = { Text("Repeat Days", color = onSurfaceDark) },
-                containerColor = surfaceContainerHighDark,
-                text = {
-                    Column {
-                        days.forEach { day ->
-                            Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth().clickable {
-                                selectedDays = if (selectedDays.contains(day)) selectedDays - day else selectedDays + day
-                            }) {
-                                Checkbox(checked = selectedDays.contains(day), onCheckedChange = { 
-                                    selectedDays = if (it) selectedDays + day else selectedDays - day
-                                }, colors = CheckboxDefaults.colors(checkedColor = primaryDark))
-                                Text(day, color = onSurfaceDark)
-                            }
-                        }
-                    }
-                },
-                confirmButton = {
-                    TextButton(onClick = {
-                        repeatDays = when (selectedDays.size) {
-                            7 -> "Daily"
-                            0 -> "Never"
-                            5 -> if (selectedDays.containsAll(listOf("Mon", "Tue", "Wed", "Thu", "Fri"))) "Mon-Fri" else selectedDays.joinToString(", ")
-                            2 -> if (selectedDays.containsAll(listOf("Sat", "Sun"))) "Sat-Sun" else selectedDays.joinToString(", ")
-                            else -> days.filter { selectedDays.contains(it) }.joinToString(", ")
-                        }
-                        showRepeatDialog = false
-                    }) {
-                        Text("Save", color = primaryDark)
-                    }
-                }
-            )
-        }
+        
 
 
         
