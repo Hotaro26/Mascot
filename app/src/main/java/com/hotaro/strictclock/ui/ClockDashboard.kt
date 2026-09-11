@@ -90,11 +90,20 @@ fun ClockDashboard(viewModel: AlarmViewModel? = null, onNavigateToSetup: () -> U
             
             items(alarms, key = { it.id }) { alarm ->
                 var showDeleteConfirm by remember { mutableStateOf(false) }
+                val localContext = androidx.compose.ui.platform.LocalContext.current
+                val localPrefs = localContext.getSharedPreferences("strict_clock_prefs", android.content.Context.MODE_PRIVATE)
+                val noSwipeConfirm = localPrefs.getBoolean("no_swipe_delete_confirm", false)
+                
                 val dismissState = rememberSwipeToDismissBoxState(
                     confirmValueChange = {
                         if (it == SwipeToDismissBoxValue.EndToStart || it == SwipeToDismissBoxValue.StartToEnd) {
-                            showDeleteConfirm = true
-                            false
+                            if (noSwipeConfirm) {
+                                viewModel?.delete(alarm)
+                                true
+                            } else {
+                                showDeleteConfirm = true
+                                false
+                            }
                         } else {
                             false
                         }
@@ -163,7 +172,13 @@ fun ClockDashboard(viewModel: AlarmViewModel? = null, onNavigateToSetup: () -> U
                         challengeText = if (alarm.challengeType == "None") "No Challenge" else "${alarm.challengeType} Challenge",
                         isActive = alarm.isActive,
                         onToggle = { isChecked ->
-                            viewModel?.update(alarm.copy(isActive = isChecked))
+                            val updatedAlarm = alarm.copy(isActive = isChecked)
+                            viewModel?.update(updatedAlarm)
+                            if (isChecked) {
+                                val triggerTime = com.hotaro.strictclock.utils.AlarmUtils.getNextTriggerTime(updatedAlarm)
+                                val toastMsg = com.hotaro.strictclock.utils.AlarmUtils.formatTimeUntil(triggerTime)
+                                android.widget.Toast.makeText(localContext, toastMsg, android.widget.Toast.LENGTH_SHORT).show()
+                            }
                         },
                         onClick = { onEditAlarm(alarm) }
                     )

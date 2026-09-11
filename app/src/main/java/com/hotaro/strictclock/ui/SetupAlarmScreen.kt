@@ -147,6 +147,9 @@ fun SetupAlarmScreen(viewModel: AlarmViewModel? = null, alarm: AlarmEntity? = nu
                             } else {
                                 viewModel?.update(newAlarm)
                             }
+                            val triggerTime = com.hotaro.strictclock.utils.AlarmUtils.getNextTriggerTime(newAlarm)
+                            val toastMsg = com.hotaro.strictclock.utils.AlarmUtils.formatTimeUntil(triggerTime)
+                            android.widget.Toast.makeText(context, toastMsg, android.widget.Toast.LENGTH_LONG).show()
                             onBack()
                         },
                         colors = ButtonDefaults.buttonColors(containerColor = primaryContainerDark, contentColor = onPrimaryContainerDark),

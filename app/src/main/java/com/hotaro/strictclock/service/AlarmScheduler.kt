@@ -35,21 +35,11 @@ class AlarmScheduler(private val context: Context) {
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
 
-        // Calculate next trigger time
-        val calendar = Calendar.getInstance().apply {
-            set(Calendar.HOUR_OF_DAY, alarm.timeHour)
-            set(Calendar.MINUTE, alarm.timeMinute)
-            set(Calendar.SECOND, 0)
-            set(Calendar.MILLISECOND, 0)
-            
-            // If the time has passed today, schedule for tomorrow
-            if (timeInMillis <= System.currentTimeMillis()) {
-                add(Calendar.DAY_OF_YEAR, 1)
-            }
-        }
+        // Calculate next trigger time using utils
+        val triggerTime = com.hotaro.strictclock.utils.AlarmUtils.getNextTriggerTime(alarm)
 
         val alarmClockInfo = AlarmManager.AlarmClockInfo(
-            calendar.timeInMillis,
+            triggerTime,
             pendingIntent
         )
 

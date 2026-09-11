@@ -24,6 +24,7 @@ import com.hotaro.strictclock.ui.theme.*
 @Composable
 fun SettingsScreen(
     onNavigateToWakeUpStreak: () -> Unit = {},
+    onNavigateToAlarmPreference: () -> Unit = {},
     onNavigateToColorScheme: () -> Unit = {},
     onNavigateToThemeMode: () -> Unit = {},
     onNavigateToQrManagement: () -> Unit = {},
@@ -130,6 +131,8 @@ fun SettingsScreen(
                     ringtoneLauncher.launch(intent)
                 }
             )
+            Spacer(modifier = Modifier.height(2.dp))
+            SettingsRow(icon = Icons.Outlined.Settings, title = "Alarm Preferences", subtitle = "Deletion rules and behaviors", showArrow = true, topStart = 4.dp, topEnd = 4.dp, bottomStart = 4.dp, bottomEnd = 4.dp, onClick = onNavigateToAlarmPreference)
             Spacer(modifier = Modifier.height(2.dp))
             SettingsRow(icon = Icons.Outlined.Snooze, title = "Zen Mode", subtitle = "Manage snoozing", showArrow = true, topStart = 4.dp, topEnd = 4.dp, bottomStart = 4.dp, bottomEnd = 4.dp, onClick = onNavigateToZenMode)
             Spacer(modifier = Modifier.height(2.dp))

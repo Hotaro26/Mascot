@@ -193,7 +193,12 @@ fun StrictClockApp(isWakeUp: Boolean = false, challengeType: String = "None", qr
                                             val repo = com.hotaro.strictclock.data.AlarmRepository(com.hotaro.strictclock.data.AppDatabase.getDatabase(context).alarmDao())
                                             val alarm = repo.getAlarmById(activeAlarmId)
                                             if (alarm != null && alarm.daysOfWeek == "Never") {
-                                                repo.update(alarm.copy(isActive = false))
+                                                val prefs = context.getSharedPreferences("strict_clock_prefs", android.content.Context.MODE_PRIVATE)
+                                                if (prefs.getBoolean("auto_delete_one_time", false)) {
+                                                    repo.delete(alarm)
+                                                } else {
+                                                    repo.update(alarm.copy(isActive = false))
+                                                }
                                             }
                                         }
                                     }.start()
@@ -259,6 +264,7 @@ fun StrictClockApp(isWakeUp: Boolean = false, challengeType: String = "None", qr
                     "Timer" -> TimerScreen()
                     "Settings" -> SettingsScreen(
                         onNavigateToWakeUpStreak = { currentScreen = "WakeUpStreak" },
+                        onNavigateToAlarmPreference = { currentScreen = "AlarmPreference" },
                         onNavigateToColorScheme = { currentScreen = "ColorScheme" },
                         onNavigateToThemeMode = { currentScreen = "ThemeMode" },
                         onNavigateToQrManagement = { currentScreen = "QrManagement" },
@@ -274,6 +280,7 @@ fun StrictClockApp(isWakeUp: Boolean = false, challengeType: String = "None", qr
                         scrollState = settingsScrollState
                     )
                     "AppIcons" -> AppIconsScreen(onBack = { currentScreen = "Settings" })
+                    "AlarmPreference" -> AlarmPreferenceScreen(onBack = { currentScreen = "Settings" })
                     "WakeUpStreak" -> WakeUpStreakScreen(onBack = { currentScreen = "Settings" })
                     "MathSettings" -> MathSettingsScreen(onBack = { currentScreen = "Settings" })
                     "PuzzleSettings" -> PuzzleSettingsScreen(onBack = { currentScreen = "Settings" })
