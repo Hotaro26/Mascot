@@ -25,6 +25,7 @@ import androidx.compose.material.icons.filled.Timer
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.unit.dp
@@ -99,6 +100,20 @@ fun StrictClockApp(isWakeUp: Boolean = false, challengeType: String = "None", qr
         factory = AlarmViewModelFactory(app.repository, app.scheduler)
     )
     
+    val density = androidx.compose.ui.platform.LocalDensity.current
+    var bottomNavOffset by remember { mutableStateOf(0f) }
+    val maxBottomNavOffset = with(density) { 120.dp.toPx() } // Hide distance
+    val nestedScrollConnection = remember {
+        object : androidx.compose.ui.input.nestedscroll.NestedScrollConnection {
+            override fun onPreScroll(available: androidx.compose.ui.geometry.Offset, source: androidx.compose.ui.input.nestedscroll.NestedScrollSource): androidx.compose.ui.geometry.Offset {
+                val delta = available.y
+                val newOffset = bottomNavOffset - delta
+                bottomNavOffset = newOffset.coerceIn(0f, maxBottomNavOffset)
+                return androidx.compose.ui.geometry.Offset.Zero
+            }
+        }
+    }
+    
     BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
         val isTablet = maxWidth >= 600.dp
         val availableWidth = maxWidth
@@ -116,7 +131,7 @@ fun StrictClockApp(isWakeUp: Boolean = false, challengeType: String = "None", qr
                 containerColor = backgroundDark
             ) { innerPadding ->
                 val horizontalMargin = if (isTablet) availableWidth * 0.1f else 0.dp
-                Box(modifier = Modifier.fillMaxSize().padding(innerPadding).padding(horizontal = horizontalMargin)) {
+                Box(modifier = Modifier.fillMaxSize().padding(innerPadding).padding(horizontal = horizontalMargin).nestedScroll(nestedScrollConnection)) {
             androidx.compose.animation.AnimatedContent(
                 targetState = currentScreen,
                 transitionSpec = {
@@ -251,8 +266,18 @@ fun StrictClockApp(isWakeUp: Boolean = false, challengeType: String = "None", qr
                 }
             }
             if (!isTablet && showNavigation) {
-                Box(modifier = Modifier.fillMaxSize(), contentAlignment = androidx.compose.ui.Alignment.BottomCenter) {
-                    MainNavigationBar(currentScreen = currentScreen, onNavigate = { currentScreen = it })
+                Box(
+                    modifier = Modifier.fillMaxSize(), 
+                    contentAlignment = androidx.compose.ui.Alignment.BottomCenter
+                ) {
+                    val animatedOffset by androidx.compose.animation.core.animateFloatAsState(
+                        targetValue = bottomNavOffset, 
+                        label = "navOffset",
+                        animationSpec = androidx.compose.animation.core.tween(durationMillis = 150)
+                    )
+                    Box(modifier = Modifier.offset { androidx.compose.ui.unit.IntOffset(0, animatedOffset.toInt()) }) {
+                        MainNavigationBar(currentScreen = currentScreen, onNavigate = { currentScreen = it })
+                    }
                 }
             }
         }
