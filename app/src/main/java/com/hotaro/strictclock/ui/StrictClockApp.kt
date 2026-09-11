@@ -254,6 +254,7 @@ fun StrictClockApp(isWakeUp: Boolean = false, challengeType: String = "None", qr
                     else -> ClockDashboard(onNavigateToSetup = { currentScreen = "Setup" })
                 }
             }
+            
         }
         }
     }
@@ -297,9 +298,9 @@ fun MainNavigationBar(currentScreen: String, onNavigate: (String) -> Unit) {
 
         Surface(
             shape = androidx.compose.foundation.shape.CircleShape,
-            color = MaterialTheme.colorScheme.primaryContainer,
+            color = androidx.compose.ui.graphics.Color.Transparent,
             contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
-            shadowElevation = 6.dp,
+            shadowElevation = 0.dp,
         ) {
             Row(
                 modifier = Modifier
