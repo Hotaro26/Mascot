@@ -29,12 +29,12 @@ Mascot makes you do annoying stuff like solving math problems, scanning random Q
 ## Screenshots
 <table>
   <tr>
-    <td><img src="https://github.com/user-attachments/assets/294841f6-b569-48f2-87f1-814d2e0c23ba" width="250"></td>
+    <td><img src="https://github.com/user-attachments/assets/223e8bb2-88f8-4d04-8c69-c260d872d77e" width="250"></td>
     <td><img src="https://github.com/user-attachments/assets/6c62f443-db78-4d8c-b27e-0bd910e30bdc" width="250"></td>
     <td><img src="https://github.com/user-attachments/assets/471d60ee-06d8-426a-9489-b01d1bba4781" width="250"></td>
   </tr>
   <tr>
-    <td><img src="https://github.com/user-attachments/assets/223e8bb2-88f8-4d04-8c69-c260d872d77e" width="250"></td>
+    <td><img src="https://github.com/user-attachments/assets/294841f6-b569-48f2-87f1-814d2e0c23ba" width="250"></td>
     <td><img src="https://github.com/user-attachments/assets/8ac1e114-e1fe-4844-a83d-3970e14327ff" width="250"></td>
     <td><img src="https://github.com/user-attachments/assets/a2b01678-f239-4efd-8293-b28637ea7dd3" width="250"></td>
   </tr>
