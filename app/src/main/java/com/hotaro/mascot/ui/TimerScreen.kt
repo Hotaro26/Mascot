@@ -180,25 +180,15 @@ fun TimerScreen() {
                     targetState = (!isRunning && timeRemaining == 0L) || hideTimerBox,
                     modifier = Modifier.fillMaxSize(),
                     transitionSpec = {
-                        if (targetState) {
-                            // Going TO setup (closing timer) — fast & snappy
-                            (fadeIn(tween(150)) + scaleIn(tween(150), initialScale = 0.9f)) togetherWith
-                                (fadeOut(tween(150)) + scaleOut(tween(150), targetScale = 0.9f))
-                        } else {
-                            // Going TO running (starting timer) — animated
-                            scaleIn(
-                                animationSpec = spring(
-                                    dampingRatio = Spring.DampingRatioMediumBouncy,
-                                    stiffness = Spring.StiffnessLow
-                                ),
-                                initialScale = 0.8f
-                            ) togetherWith scaleOut(
-                                animationSpec = spring(
-                                    dampingRatio = Spring.DampingRatioNoBouncy,
-                                    stiffness = Spring.StiffnessMedium
-                                ),
-                                targetScale = 0.8f
-                            )
+                        val morphicAlpha = spring<Float>(stiffness = Spring.StiffnessLow)
+                        val morphicScale = spring<Float>(
+                            dampingRatio = 0.75f, // Smooth slight bounce for a "morphic" feel
+                            stiffness = Spring.StiffnessLow
+                        )
+                        
+                        (fadeIn(morphicAlpha) + scaleIn(morphicScale, initialScale = 0.85f)) togetherWith
+                        (fadeOut(morphicAlpha) + scaleOut(morphicScale, targetScale = 0.85f)) using SizeTransform { _, _ ->
+                            spring(dampingRatio = 0.75f, stiffness = Spring.StiffnessLow)
                         }
                     },
                     label = "timer_state"
