@@ -112,15 +112,11 @@ fun StrictClockApp(isWakeUp: Boolean = false, challengeType: String = "None", qr
             Scaffold(
                 modifier = Modifier.weight(1f).fillMaxHeight(),
                 contentWindowInsets = WindowInsets.systemBars.only(WindowInsetsSides.Horizontal + WindowInsetsSides.Top),
-                bottomBar = {
-                    if (!isTablet && showNavigation) {
-                        MainNavigationBar(currentScreen = currentScreen, onNavigate = { currentScreen = it })
-                    }
-                },
+                
                 containerColor = backgroundDark
             ) { innerPadding ->
                 val horizontalMargin = if (isTablet) availableWidth * 0.1f else 0.dp
-                Box(modifier = Modifier.padding(innerPadding).padding(horizontal = horizontalMargin)) {
+                Box(modifier = Modifier.fillMaxSize().padding(innerPadding).padding(horizontal = horizontalMargin)) {
             androidx.compose.animation.AnimatedContent(
                 targetState = currentScreen,
                 transitionSpec = {
@@ -254,7 +250,11 @@ fun StrictClockApp(isWakeUp: Boolean = false, challengeType: String = "None", qr
                     else -> ClockDashboard(onNavigateToSetup = { currentScreen = "Setup" })
                 }
             }
-            
+            if (!isTablet && showNavigation) {
+                Box(modifier = Modifier.fillMaxSize(), contentAlignment = androidx.compose.ui.Alignment.BottomCenter) {
+                    MainNavigationBar(currentScreen = currentScreen, onNavigate = { currentScreen = it })
+                }
+            }
         }
         }
     }
@@ -298,9 +298,9 @@ fun MainNavigationBar(currentScreen: String, onNavigate: (String) -> Unit) {
 
         Surface(
             shape = androidx.compose.foundation.shape.CircleShape,
-            color = androidx.compose.ui.graphics.Color.Transparent,
+            color = MaterialTheme.colorScheme.primaryContainer,
             contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
-            shadowElevation = 0.dp,
+            shadowElevation = 6.dp,
         ) {
             Row(
                 modifier = Modifier

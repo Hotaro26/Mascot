@@ -67,7 +67,7 @@ fun ClockDashboard(viewModel: AlarmViewModel? = null, onNavigateToSetup: () -> U
                 containerColor = tertiaryDark, // Pinkish color from design
                 contentColor = onTertiaryDark,
                 modifier = Modifier
-                    .padding(16.dp)
+                    .padding(bottom = 90.dp, end = 16.dp)
                     .size(80.dp) // Large FAB
             ) {
                 Icon(Icons.Default.Add, contentDescription = "Add Alarm", modifier = Modifier.size(32.dp))
@@ -171,7 +171,7 @@ fun ClockDashboard(viewModel: AlarmViewModel? = null, onNavigateToSetup: () -> U
             }
             
             item {
-                Spacer(modifier = Modifier.height(100.dp)) // Space for FAB
+                Spacer(modifier = Modifier.height(180.dp)) // Space for FAB
             }
         }
     }
