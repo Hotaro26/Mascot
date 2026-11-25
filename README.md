@@ -101,7 +101,7 @@ just make sure your code isn't super messy and you're good to go.
 
 Mascot is licensed under the [MIT License](LICENSE). do whatever you want with the code, just don't blame me if you still sleep through your math problems.
 ## Donate
-You can support Miko development through [kofi](buymeacoffee.com/oi.hotaro)
+You can support Mascot development through [kofi](buymeacoffee.com/oi.hotaro)
 
 <a href="buymeacoffee.com/oi.hotaro)
 ">
