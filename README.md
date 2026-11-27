@@ -101,11 +101,10 @@ just make sure your code isn't super messy and you're good to go.
 
 Mascot is licensed under the [MIT License](LICENSE). do whatever you want with the code, just don't blame me if you still sleep through your math problems.
 ## Donate
-You can support Mascot development through [buy me a coffee](buymeacoffee.com/oi.hotaro)
+You can support Mascot development through [buy me a coffee](https://buymeacoffee.com/oi.hotaro)
 
-<a href="buymeacoffee.com/oi.hotaro)
-">
-  <img src="https://github.com/user-attachments/assets/f62638ee-9ad9-42c6-b275-a620b4cabe25" width="128px">
+<a href="https://buymeacoffee.com/oi.hotaro">
+  <img src="https://github.com/user-attachments/assets/f62638ee-9ad9-42c6-b275-a620b4cabe25" width="128" />
 </a>
 
 ## Star History
